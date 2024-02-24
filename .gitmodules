@@ -1,0 +1,3 @@
+[submodule "lib/device-ui"]
+	path = lib/device-ui
+	url = https://github.com/mverch67/device-ui.git

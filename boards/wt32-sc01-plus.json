@@ -1,0 +1,44 @@
+{
+    "build": {
+      "arduino": {
+        "ldscript": "esp32s3_out.ld",
+        "memory_type": "qio_qspi",
+        "partitions": "default_16MB.csv"
+      },
+      "core": "esp32",
+      "extra_flags": [
+        "-DBOARD_HAS_PSRAM",
+        "-DARDUINO_USB_CDC_ON_BOOT=1",
+        "-DARDUINO_USB_MODE=1",
+        "-DARDUINO_RUNNING_CORE=1",
+        "-DARDUINO_EVENT_RUNNING_CORE=1"
+      ],
+      "f_cpu": "240000000L",
+      "f_flash": "80000000L",
+      "flash_mode": "qio",
+      "hwids": [["0x303A", "0x80D0"]],
+      "mcu": "esp32s3",
+      "variant": "wt32-sc01-plus"
+    },
+    "connectivity": ["wifi", "bluetooth"],
+    "debug": {
+      "default_tool": "esp-builtin",
+      "onboard_tools": ["esp-builtin"],
+      "openocd_target": "esp32s3.cfg"
+    },
+    "frameworks": ["arduino", "espidf"],
+    "name": "WT32-SC01 Plus (16 MB Flash, 8 MB PSRAM)",
+    "upload": {
+      "flash_size": "16MB",
+      "maximum_ram_size": 327680,
+      "maximum_size": 16777216,
+      "require_upload_port": true,
+      "speed": 921600
+    },
+    "monitor": {
+      "speed" : 115200
+    },
+      "url": "http://en.wireless-tag.com/product-item-26.html",
+    "vendor": "wireless-tag"
+  }
+  
