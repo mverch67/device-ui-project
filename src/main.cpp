@@ -28,7 +28,7 @@ void setup() {
 #endif
 
   screen = &DeviceScreen::create();
-  screen->init();
+  screen->init(nullptr);
 
 #ifdef ARDUINO_ARCH_ESP32
   Serial.printf("Free heap : %8d bytes\n\r", ESP.getFreeHeap());
