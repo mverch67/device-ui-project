@@ -1,12 +1,34 @@
 #include "DeviceScreen.h"
 #include "Arduino.h"
+#include "Log.h"
+
+const char *firmware_version = "1.0.0";
+
+class DummyClient : public IClientBase {
+  public:
+    DummyClient() = default;
+    void init(void) override { }
+    bool connect(void) override { return true; }
+    bool disconnect(void) override { return true; }
+    bool isConnected(void) override { return false; }
+    bool send(meshtastic_ToRadio &&to) override { return false; }
+    meshtastic_FromRadio receive(void) override { meshtastic_FromRadio dummy {}; return dummy; }
+    ~DummyClient() { };
+
+} dummy;
+
 
 DeviceScreen* screen = nullptr;
+
+extern Log logger;
+
 
 
 void setup() {
     Serial.begin(115200);
     delay(2000);
+
+    logger.setDebugLevel(ESP_LOG_VERBOSE);
 
 #ifdef KB_POWERON
     digitalWrite(KB_POWERON, HIGH);
@@ -28,7 +50,7 @@ void setup() {
 #endif
 
   screen = &DeviceScreen::create();
-  screen->init(nullptr);
+  screen->init(&dummy);
 
 #ifdef ARDUINO_ARCH_ESP32
   Serial.printf("Free heap : %8d bytes\n\r", ESP.getFreeHeap());
@@ -42,5 +64,5 @@ void setup() {
 /*** main loop ***/
 void loop() {
     screen->task_handler();
-    delay(20);
+    delay(10);
 }
