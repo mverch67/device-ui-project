@@ -1,9 +1,13 @@
+#ifndef PIO_UNIT_TESTING
+
 #include "DeviceScreen.h"
+#include "UARTClient.h"
 #include "Arduino.h"
 #include "Log.h"
 
-const char *firmware_version = "1.0.0";
+const char *firmware_version = "2.3.2";
 
+#ifdef USE_DUMMY_SERIAL
 class DummyClient : public IClientBase {
   public:
     DummyClient() = default;
@@ -15,20 +19,26 @@ class DummyClient : public IClientBase {
     meshtastic_FromRadio receive(void) override { meshtastic_FromRadio dummy {}; return dummy; }
     ~DummyClient() { };
 
-} dummy;
-
+} serial;
+#else
+UARTClient serial;
+#endif
 
 DeviceScreen* screen = nullptr;
 
 extern Log logger;
 
 
-
 void setup() {
+#ifndef USE_SERIAL0
     Serial.begin(115200);
-    delay(2000);
+    time_t timeout = millis();
+    while (!Serial && (millis() - timeout) < 2000);
+    logger.setDebugLevel(ESP_LOG_DEBUG); // use ESP_LOG_VERBOSE for trace category
+#else
+    logger.setDebugLevel(ESP_LOG_NONE);
+#endif
 
-    logger.setDebugLevel(ESP_LOG_VERBOSE);
 
 #ifdef KB_POWERON
     digitalWrite(KB_POWERON, HIGH);
@@ -36,33 +46,42 @@ void setup() {
     delay(200); // wait until keyboard mcu startup finished
 #endif
 
-  Serial.println("\n*** SquareLine Studio (LovyanGFX TFT) ***");
+  ILOG_DEBUG("\n*** SquareLine Studio (LovyanGFX) TFT GUI ***\n");
 #ifdef ARDUINO_ARCH_ESP32
   uint64_t chipid;
   chipid = ESP.getEfuseMac(); //The chip ID is essentially its MAC address(length: 6 bytes).
-  Serial.printf("  ESP32 Chip ID = %04X", (uint16_t)(chipid >> 32)); //print High 2 bytes
-  Serial.printf("%08X\n\r", (uint32_t)chipid); //print Low 4bytes.
-  Serial.printf("  Flash size: %8d bytes\n\r", ESP.getFlashChipSize());
-  Serial.printf("  Heap size : %8d bytes\n\r", ESP.getHeapSize());
-  Serial.printf("  Free heap : %8d bytes\n\r", ESP.getFreeHeap());
-  Serial.printf("  PSRAM     : %8d bytes\n\r", ESP.getFreePsram());
-  Serial.println("*****************************************\n");
+  ILOG_DEBUG("  ESP32 Chip ID = %04X\n", (uint16_t)(chipid >> 32)); //print High 2 bytes
+  ILOG_DEBUG("%08X\n\r", (uint32_t)chipid); //print Low 4bytes.
+  ILOG_DEBUG("  Flash size: %8d bytes\n\r", ESP.getFlashChipSize());
+  ILOG_DEBUG("  Heap size : %8d bytes\n\r", ESP.getHeapSize());
+  ILOG_DEBUG("  Free heap : %8d bytes\n\r", ESP.getFreeHeap());
+  ILOG_DEBUG("  PSRAM     : %8d bytes\n\r", ESP.getFreePsram());
+  ILOG_DEBUG("*****************************************\n");
 #endif
 
   screen = &DeviceScreen::create();
-  screen->init(&dummy);
+  screen->init(&serial);
 
 #ifdef ARDUINO_ARCH_ESP32
-  Serial.printf("Free heap : %8d bytes\n\r", ESP.getFreeHeap());
-  Serial.printf("PSRAM     : %8d bytes\n\r", ESP.getFreePsram());
+  ILOG_DEBUG("Free heap : %8d bytes\n\r", ESP.getFreeHeap());
+  ILOG_DEBUG("PSRAM     : %8d bytes\n\r", ESP.getFreePsram());
 #endif
 
-  Serial.println("Setup done.");
+  ILOG_DEBUG("Setup done.\n\r");
 }
 
 
 /*** main loop ***/
 void loop() {
     screen->task_handler();
-    delay(10);
+    delay(5);
 }
+
+#if defined(PORTDUINO)
+void tft_task_handler(void*) {
+    screen->task_handler();
+    delay(5);
+}
+#endif
+
+#endif
