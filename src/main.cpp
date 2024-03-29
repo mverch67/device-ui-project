@@ -34,7 +34,7 @@ void setup() {
     Serial.begin(115200);
     time_t timeout = millis();
     while (!Serial && (millis() - timeout) < 2000);
-    logger.setDebugLevel(ESP_LOG_DEBUG); // use ESP_LOG_VERBOSE for trace category
+    logger.setDebugLevel(ESP_LOG_VERBOSE); // use ESP_LOG_VERBOSE for trace category
 #else
     logger.setDebugLevel(ESP_LOG_NONE);
 #endif
