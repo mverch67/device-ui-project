@@ -17,7 +17,7 @@ SerialClient* SerialClient::instance = nullptr;
 
 SerialClient::SerialClient(void) : connected(false), shutdown(false), pb_size(0), bytes_read(0)
 {
-    buffer = new uint8_t(PB_BUFSIZE + MT_HEADER_SIZE);
+    buffer = new uint8_t[PB_BUFSIZE + MT_HEADER_SIZE];
     instance = this;
 }
 
