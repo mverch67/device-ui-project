@@ -38,9 +38,9 @@ std::vector<uint8_t> &MeshEnvelope::encode(const meshtastic_ToRadio &toRadio)
 
 /**
  * @brief decoding of validated bytestream
- * 
- * @param pb_size 
- * @return meshtastic_FromRadio 
+ *
+ * @param pb_size
+ * @return meshtastic_FromRadio
  */
 meshtastic_FromRadio MeshEnvelope::decode()
 {
@@ -60,13 +60,13 @@ meshtastic_FromRadio MeshEnvelope::decode()
 
 /**
  * @brief search packet magic in byte stream and move it to beginning
- * 
+ *
  * @param pb_buf inout: byte stream
  * @param pb_size inout: length of byte stream
  * @param size out: length of packet
  * @return true if stream contains full packet at beginning of buffer
  */
-bool MeshEnvelope::validate(uint8_t *pb_buf, size_t &pb_size, size_t& payload_len)
+bool MeshEnvelope::validate(uint8_t *pb_buf, size_t &pb_size, size_t &payload_len)
 {
     size_t startpos = 0;
     if (pb_size < MT_HEADER_SIZE) {
@@ -77,12 +77,13 @@ bool MeshEnvelope::validate(uint8_t *pb_buf, size_t &pb_size, size_t& payload_le
         startpos++;
     }
     if (startpos >= pb_size) {
-        ILOG_WARN("MeshEnvelope: no magic found, skipping %d bytes\n", pb_size);
+        ILOG_WARN("MeshEnvelope: no magic found, skipping %d bytes (%02x%02x%02x...)\n", pb_size, (int)pb_buf[0], (int)pb_buf[1],
+                  (int)pb_buf[2]);
         pb_size = 0;
         return false;
     }
 
-    payload_len = (pb_buf[startpos+2] << 8) | pb_buf[startpos+3];
+    payload_len = (pb_buf[startpos + 2] << 8) | pb_buf[startpos + 3];
     if (startpos > 0) {
         if (payload_len > PB_BUFSIZE) {
             ILOG_ERROR("Got packet claiming to be ridiculous length (%d bytes)\n", payload_len);
@@ -92,7 +93,7 @@ bool MeshEnvelope::validate(uint8_t *pb_buf, size_t &pb_size, size_t& payload_le
         }
 
         // re-align magic header to front of buffer
-        ILOG_TRACE("Skipping first %d bytes\n", startpos);
+        ILOG_TRACE("Skipping first %d bytes (%02x%02x%02x...)\n", startpos, (int)pb_buf[0], (int)pb_buf[1], (int)pb_buf[2]);
         pb_size -= startpos;
         memmove(&pb_buf[0], &pb_buf[startpos], pb_size);
     }
@@ -109,19 +110,18 @@ bool MeshEnvelope::validate(uint8_t *pb_buf, size_t &pb_size, size_t& payload_le
 
 /**
  * @brief remove old packet from buffer and move next payload to front
- * 
+ *
  * @param pb_buf inout: byte stream
  * @param pb_size inout: length of byte stream
  * @param size out: length of packet
  */
-void MeshEnvelope::invalidate(uint8_t *pb_buf, size_t &pb_size, size_t& payload_len)
+void MeshEnvelope::invalidate(uint8_t *pb_buf, size_t &pb_size, size_t &payload_len)
 {
     pb_buf[0] = 0x00;
     pb_buf[1] = 0x00;
     if (pb_size < payload_len + MT_HEADER_SIZE) {
         pb_size = 0;
-    }
-    else {
+    } else {
         pb_size -= payload_len + MT_HEADER_SIZE;
     }
     memmove(&pb_buf[0], &pb_buf[payload_len + MT_HEADER_SIZE], pb_size);
