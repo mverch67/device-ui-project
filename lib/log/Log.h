@@ -3,18 +3,11 @@
 #if defined(ARCH_ESP32)
 #include "esp_log.h"
 #elif defined(PORTDUINO)
-typedef enum {
-    ESP_LOG_NONE,
-    ESP_LOG_ERROR,
-    ESP_LOG_WARN,
-    ESP_LOG_INFO,
-    ESP_LOG_DEBUG,
-    ESP_LOG_VERBOSE
-} esp_log_level_t;
+typedef enum { ESP_LOG_NONE, ESP_LOG_ERROR, ESP_LOG_WARN, ESP_LOG_INFO, ESP_LOG_DEBUG, ESP_LOG_VERBOSE } esp_log_level_t;
 #endif
 
-
-class Log : public ILog {
+class Log : public ILog
+{
   public:
     Log() : ILog(this) { setDebugLevel(ESP_LOG_VERBOSE); }
     void setDebugLevel(esp_log_level_t lvl);
@@ -28,3 +21,4 @@ class Log : public ILog {
     virtual void log_trace(const char *format, ...) override;
 };
 
+extern Log logger;

@@ -10,51 +10,57 @@
 #define esp_log_level_set(...)
 #endif
 
-
 Log logger;
 
-void Log::setDebugLevel(esp_log_level_t lvl) {
+void Log::setDebugLevel(esp_log_level_t lvl)
+{
     esp_log_level_set("*", lvl);
 }
 
-void Log::log_debug(const char *format, ...) {
+void Log::log_debug(const char *format, ...)
+{
     va_list arg;
     va_start(arg, format);
     LOG_FWD(ESP_LOG_DEBUG, "TFT", format, arg);
     va_end(arg);
 }
 
-void Log::log_info(const char *format, ...) {
+void Log::log_info(const char *format, ...)
+{
     va_list arg;
     va_start(arg, format);
     LOG_FWD(ESP_LOG_INFO, "TFT", format, arg);
     va_end(arg);
 }
 
-void Log::log_warn(const char *format, ...) {
+void Log::log_warn(const char *format, ...)
+{
     va_list arg;
     va_start(arg, format);
     LOG_FWD(ESP_LOG_WARN, "TFT", format, arg);
     va_end(arg);
 }
 
-void Log::log_error(const char *format, ...) {
+void Log::log_error(const char *format, ...)
+{
     va_list arg;
     va_start(arg, format);
     LOG_FWD(ESP_LOG_ERROR, "TFT", format, arg);
     va_end(arg);
 }
 
-void Log::log_crit(const char *format, ...) {
+void Log::log_crit(const char *format, ...)
+{
     va_list arg;
     va_start(arg, format);
     LOG_FWD(ESP_LOG_ERROR, "TFT", format, arg);
     va_end(arg);
 }
 
-void Log::log_trace(const char *format, ...) {
+void Log::log_trace(const char *format, ...)
+{
     va_list arg;
     va_start(arg, format);
-    LOG_FWD(ESP_LOG_VERBOSE, "tag", format, arg);
+    LOG_FWD(ESP_LOG_VERBOSE, "TFT", format, arg);
     va_end(arg);
 }
