@@ -1,10 +1,9 @@
 #include "UARTClient.h"
-#include "Log.h"
 #include "Arduino.h"
-
+#include "Log.h"
 
 #ifndef SERIAL_BAUD
-#define SERIAL_BAUD 115200
+#define SERIAL_BAUD 38400
 #endif
 
 #define RX_BUFFER 1024
@@ -13,11 +12,7 @@
 
 extern const uint8_t MT_MAGIC_0;
 
-
-UARTClient::UARTClient(void) : _serial(nullptr)
-{
-
-}
+UARTClient::UARTClient(void) : _serial(nullptr) {}
 
 /**
  * @brief init serial interface
@@ -100,15 +95,15 @@ meshtastic_FromRadio UARTClient::receive(void)
     return SerialClient::receive();
 }
 
-UARTClient::~UARTClient() { 
+UARTClient::~UARTClient(){
 
 };
-
 
 // --- protected part ---
 
 // raw write to serial UART interface
-bool UARTClient::send(const uint8_t* buf, size_t len) {
+bool UARTClient::send(const uint8_t *buf, size_t len)
+{
     ILOG_TRACE("sending %d bytes to radio\n", len);
     size_t wrote = _serial->write(buf, len);
     if (wrote != len) {
@@ -118,7 +113,8 @@ bool UARTClient::send(const uint8_t* buf, size_t len) {
 }
 
 // raw read from serial UART interface
-size_t UARTClient::receive(uint8_t* buf, size_t space_left) {
+size_t UARTClient::receive(uint8_t *buf, size_t space_left)
+{
     size_t bytes_read = 0;
     while (_serial->available()) {
         uint8_t byte = _serial->read();
