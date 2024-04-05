@@ -9,6 +9,7 @@ class SerialClient : public IClientBase
   public:
     SerialClient(void);
     void init(void) override;
+    bool sleep(int16_t pin);
     bool connect(void) override;
     bool disconnect(void) override;
     bool isConnected(void) override;
@@ -30,11 +31,11 @@ class SerialClient : public IClientBase
     virtual void handleSendPacket(void);
 
     // thread handling stuff and data
-    static void task_loop(void*);
+    static void task_loop(void *);
     static SerialClient *instance;
 
     volatile bool shutdown;
-    uint8_t* buffer;
+    uint8_t *buffer;
 
     // local data
     volatile bool connected;
