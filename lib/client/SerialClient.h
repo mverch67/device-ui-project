@@ -2,7 +2,7 @@
 
 #include "IClientBase.h"
 #include "MeshEnvelope.h"
-#include "sharedMem/SharedQueue.h"
+#include "SharedQueue.h"
 
 class SerialClient : public IClientBase
 {
