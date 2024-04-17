@@ -46,6 +46,7 @@ void setup()
 #endif
 
 #ifndef USE_SERIAL0
+    delay(2000);
     Serial.begin(115200);
     time_t timeout = millis();
     while (!Serial && (millis() - timeout) < 2000)
