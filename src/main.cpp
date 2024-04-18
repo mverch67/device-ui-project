@@ -6,7 +6,7 @@
 #include "UARTClient.h"
 
 // this is pulled in by the device-ui library
-const char *firmware_version = "2.3.4";
+const char *firmware_version = "2.3.5";
 
 #ifdef USE_DUMMY_SERIAL
 class DummyClient : public IClientBase
@@ -43,6 +43,11 @@ void setup()
 #ifdef PWR_ON_PIN
     pinMode(PWR_ON_PIN, OUTPUT);
     digitalWrite(PWR_ON_PIN, HIGH);
+#endif
+
+#ifdef PWR_EN_PIN
+    pinMode(PWR_EN_PIN, OUTPUT);
+    digitalWrite(PWR_EN_PIN, HIGH);
 #endif
 
 #ifndef USE_SERIAL0
