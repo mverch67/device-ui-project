@@ -6,7 +6,7 @@
 #include "UARTClient.h"
 
 // this is pulled in by the device-ui library
-const char *firmware_version = "2.3.5";
+const char *firmware_version = "2.3.8";
 
 #ifdef USE_DUMMY_SERIAL
 class DummyClient : public IClientBase
