@@ -92,7 +92,7 @@ void loop()
     delay(5);
 }
 
-#if defined(PORTDUINO)
+#if defined(ARCH_PORTDUINO)
 void tft_task_handler(void *)
 {
     screen->task_handler();
