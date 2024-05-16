@@ -2,7 +2,7 @@
 
 #if defined(ARCH_ESP32)
 #include "esp_log.h"
-#elif defined(PORTDUINO)
+#elif defined(ARCH_PORTDUINO)
 typedef enum { ESP_LOG_NONE, ESP_LOG_ERROR, ESP_LOG_WARN, ESP_LOG_INFO, ESP_LOG_DEBUG, ESP_LOG_VERBOSE } esp_log_level_t;
 #endif
 

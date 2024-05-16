@@ -5,7 +5,7 @@
 #if defined(ARCH_ESP32)
 // simply forward all logs into the esp log forwarder
 #define LOG_FWD(LVL, TAG, FMT, ARG) esp_log_writev(LVL, TAG, FMT, ARG)
-#elif defined(PORTDUINO)
+#elif defined(ARCH_PORTDUINO)
 #define LOG_FWD(LVL, TAG, FMT, ARG) vprintf(FMT, ARG)
 #define esp_log_level_set(...)
 #endif
