@@ -124,9 +124,12 @@ typedef enum _meshtastic_PortNum {
     meshtastic_PortNum_ATAK_PLUGIN = 72,
     /* Provides unencrypted information about a node for consumption by a map via MQTT */
     meshtastic_PortNum_MAP_REPORT_APP = 73,
+    /* PowerStress based monitoring support (for automated power consumption testing) */
+    meshtastic_PortNum_POWERSTRESS_APP = 74,
     /* Private applications should use portnums >= 256.
  To simplify initial development and testing you can use "PRIVATE_APP"
- in your code without needing to rebuild protobuf files (via [regen-protos.sh](https://github.com/meshtastic/firmware/blob/master/bin/regen-protos.sh)) */
+ in your code without needing to rebuild protobuf files (via
+ [regen-protos.sh](https://github.com/meshtastic/firmware/blob/master/bin/regen-protos.sh)) */
     meshtastic_PortNum_PRIVATE_APP = 256,
     /* ATAK Forwarder Module https://github.com/paulmandal/atak-forwarder
  ENCODING: libcotshrink */
@@ -142,8 +145,7 @@ extern "C" {
 /* Helper constants for enums */
 #define _meshtastic_PortNum_MIN meshtastic_PortNum_UNKNOWN_APP
 #define _meshtastic_PortNum_MAX meshtastic_PortNum_MAX
-#define _meshtastic_PortNum_ARRAYSIZE ((meshtastic_PortNum)(meshtastic_PortNum_MAX+1))
-
+#define _meshtastic_PortNum_ARRAYSIZE ((meshtastic_PortNum)(meshtastic_PortNum_MAX + 1))
 
 #ifdef __cplusplus
 } /* extern "C" */
