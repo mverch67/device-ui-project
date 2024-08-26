@@ -8,6 +8,8 @@
 
 PB_BIND(meshtastic_PositionLite, meshtastic_PositionLite, AUTO)
 
+PB_BIND(meshtastic_UserLite, meshtastic_UserLite, AUTO)
+
 PB_BIND(meshtastic_NodeInfoLite, meshtastic_NodeInfoLite, AUTO)
 
 PB_BIND(meshtastic_DeviceState, meshtastic_DeviceState, 2)
