@@ -94,6 +94,7 @@ typedef struct _meshtastic_NodeInfoLite {
     /* True if we witnessed the node over MQTT instead of LoRA transport */
     bool via_mqtt;
     /* Number of hops away from us this node is (0 if adjacent) */
+    bool has_hops_away;
     uint8_t hops_away;
     /* True if node is in our favorites list
  Persists between NodeDB internal clean ups */
@@ -212,7 +213,7 @@ extern "C" {
 #define meshtastic_NodeInfoLite_init_default                                                                                     \
     {                                                                                                                            \
         0, false, meshtastic_UserLite_init_default, false, meshtastic_PositionLite_init_default, 0, 0, false,                    \
-            meshtastic_DeviceMetrics_init_default, 0, 0, 0, 0                                                                    \
+            meshtastic_DeviceMetrics_init_default, 0, 0, false, 0, 0                                                             \
     }
 #define meshtastic_DeviceState_init_default                                                                                      \
     {                                                                                                                            \
@@ -257,7 +258,7 @@ extern "C" {
 #define meshtastic_NodeInfoLite_init_zero                                                                                        \
     {                                                                                                                            \
         0, false, meshtastic_UserLite_init_zero, false, meshtastic_PositionLite_init_zero, 0, 0, false,                          \
-            meshtastic_DeviceMetrics_init_zero, 0, 0, 0, 0                                                                       \
+            meshtastic_DeviceMetrics_init_zero, 0, 0, false, 0, 0                                                                \
     }
 #define meshtastic_DeviceState_init_zero                                                                                         \
     {                                                                                                                            \
@@ -360,7 +361,7 @@ extern "C" {
     X(a, STATIC, OPTIONAL, MESSAGE, device_metrics, 6)                                                                           \
     X(a, STATIC, SINGULAR, UINT32, channel, 7)                                                                                   \
     X(a, STATIC, SINGULAR, BOOL, via_mqtt, 8)                                                                                    \
-    X(a, STATIC, SINGULAR, UINT32, hops_away, 9)                                                                                 \
+    X(a, STATIC, OPTIONAL, UINT32, hops_away, 9)                                                                                 \
     X(a, STATIC, SINGULAR, BOOL, is_favorite, 10)
 #define meshtastic_NodeInfoLite_CALLBACK NULL
 #define meshtastic_NodeInfoLite_DEFAULT NULL
@@ -431,7 +432,7 @@ extern const pb_msgdesc_t meshtastic_OEMStore_msg;
 #define MESHTASTIC_MESHTASTIC_DEVICEONLY_PB_H_MAX_SIZE meshtastic_OEMStore_size
 #define meshtastic_ChannelFile_size 718
 #define meshtastic_NodeInfoLite_size 183
-#define meshtastic_OEMStore_size 3496
+#define meshtastic_OEMStore_size 3578
 #define meshtastic_PositionLite_size 28
 #define meshtastic_UserLite_size 96
 

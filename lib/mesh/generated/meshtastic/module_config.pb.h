@@ -19,6 +19,23 @@ typedef enum _meshtastic_RemoteHardwarePinType {
     meshtastic_RemoteHardwarePinType_DIGITAL_WRITE = 2
 } meshtastic_RemoteHardwarePinType;
 
+typedef enum _meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType {
+    /* Event is triggered if pin is low */
+    meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType_LOGIC_LOW = 0,
+    /* Event is triggered if pin is high */
+    meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType_LOGIC_HIGH = 1,
+    /* Event is triggered when pin goes high to low */
+    meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType_FALLING_EDGE = 2,
+    /* Event is triggered when pin goes low to high */
+    meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType_RISING_EDGE = 3,
+    /* Event is triggered on every pin state change, low is considered to be
+ "active" */
+    meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType_EITHER_EDGE_ACTIVE_LOW = 4,
+    /* Event is triggered on every pin state change, high is considered to be
+ "active" */
+    meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType_EITHER_EDGE_ACTIVE_HIGH = 5
+} meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType;
+
 /* Baudrate for codec2 voice */
 typedef enum _meshtastic_ModuleConfig_AudioConfig_Audio_Baud {
     meshtastic_ModuleConfig_AudioConfig_Audio_Baud_CODEC2_DEFAULT = 0,
@@ -144,11 +161,13 @@ typedef struct _meshtastic_ModuleConfig_NeighborInfoConfig {
 typedef struct _meshtastic_ModuleConfig_DetectionSensorConfig {
     /* Whether the Module is enabled */
     bool enabled;
-    /* Interval in seconds of how often we can send a message to the mesh when a state change is detected */
+    /* Interval in seconds of how often we can send a message to the mesh when a
+ trigger event is detected */
     uint32_t minimum_broadcast_secs;
-    /* Interval in seconds of how often we should send a message to the mesh with the current state regardless of changes
- When set to 0, only state changes will be broadcasted
- Works as a sort of status heartbeat for peace of mind */
+    /* Interval in seconds of how often we should send a message to the mesh
+ with the current state regardless of trigger events When set to 0, only
+ trigger events will be broadcasted Works as a sort of status heartbeat
+ for peace of mind */
     uint32_t state_broadcast_secs;
     /* Send ASCII bell with alert message
  Useful for triggering ext. notification on bell */
@@ -159,9 +178,8 @@ typedef struct _meshtastic_ModuleConfig_DetectionSensorConfig {
     char name[20];
     /* GPIO pin to monitor for state changes */
     uint8_t monitor_pin;
-    /* Whether or not the GPIO pin state detection is triggered on HIGH (1)
- Otherwise LOW (0) */
-    bool detection_triggered_high;
+    /* The type of trigger event to be used */
+    meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType detection_trigger_type;
     /* Whether or not use INPUT_PULLUP mode for GPIO pin
  Only applicable if the board uses pull-up resistors on the pin */
     bool use_pullup;
@@ -309,15 +327,21 @@ typedef struct _meshtastic_ModuleConfig_TelemetryConfig {
     /* Interval in seconds of how often we should try to send our
  air quality metrics to the mesh */
     uint32_t air_quality_interval;
-    /* Interval in seconds of how often we should try to send our
- air quality metrics to the mesh */
+    /* Enable/disable Power metrics */
     bool power_measurement_enabled;
     /* Interval in seconds of how often we should try to send our
- air quality metrics to the mesh */
+ power metrics to the mesh */
     uint32_t power_update_interval;
-    /* Interval in seconds of how often we should try to send our
- air quality metrics to the mesh */
+    /* Enable/Disable the power measurement module on-device display */
     bool power_screen_enabled;
+    /* Preferences for the (Health) Telemetry Module
+ Enable/Disable the telemetry measurement module measurement collection */
+    bool health_measurement_enabled;
+    /* Interval in seconds of how often we should try to send our
+ health metrics to the mesh */
+    uint32_t health_update_interval;
+    /* Enable/Disable the health telemetry module on-device display */
+    bool health_screen_enabled;
 } meshtastic_ModuleConfig_TelemetryConfig;
 
 /* TODO: REPLACE */
@@ -428,6 +452,14 @@ extern "C" {
 #define _meshtastic_RemoteHardwarePinType_ARRAYSIZE                                                                              \
     ((meshtastic_RemoteHardwarePinType)(meshtastic_RemoteHardwarePinType_DIGITAL_WRITE + 1))
 
+#define _meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType_MIN                                                           \
+    meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType_LOGIC_LOW
+#define _meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType_MAX                                                           \
+    meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType_EITHER_EDGE_ACTIVE_HIGH
+#define _meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType_ARRAYSIZE                                                                         \
+    ((meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType)(meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType_EITHER_EDGE_ACTIVE_HIGH + \
+                                                                 1))
+
 #define _meshtastic_ModuleConfig_AudioConfig_Audio_Baud_MIN meshtastic_ModuleConfig_AudioConfig_Audio_Baud_CODEC2_DEFAULT
 #define _meshtastic_ModuleConfig_AudioConfig_Audio_Baud_MAX meshtastic_ModuleConfig_AudioConfig_Audio_Baud_CODEC2_700B
 #define _meshtastic_ModuleConfig_AudioConfig_Audio_Baud_ARRAYSIZE                                                                \
@@ -450,6 +482,9 @@ extern "C" {
 #define _meshtastic_ModuleConfig_CannedMessageConfig_InputEventChar_ARRAYSIZE                                                       \
     ((meshtastic_ModuleConfig_CannedMessageConfig_InputEventChar)(meshtastic_ModuleConfig_CannedMessageConfig_InputEventChar_BACK + \
                                                                   1))
+
+#define meshtastic_ModuleConfig_DetectionSensorConfig_detection_trigger_type_ENUMTYPE                                            \
+    meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType
 
 #define meshtastic_ModuleConfig_AudioConfig_bitrate_ENUMTYPE meshtastic_ModuleConfig_AudioConfig_Audio_Baud
 
@@ -495,7 +530,7 @@ extern "C" {
     }
 #define meshtastic_ModuleConfig_DetectionSensorConfig_init_default                                                               \
     {                                                                                                                            \
-        0, 0, 0, 0, "", 0, 0, 0                                                                                                  \
+        0, 0, 0, 0, "", 0, _meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType_MIN, 0                                     \
     }
 #define meshtastic_ModuleConfig_AudioConfig_init_default                                                                         \
     {                                                                                                                            \
@@ -524,7 +559,7 @@ extern "C" {
     }
 #define meshtastic_ModuleConfig_TelemetryConfig_init_default                                                                     \
     {                                                                                                                            \
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0                                                                                             \
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                                                                                    \
     }
 #define meshtastic_ModuleConfig_CannedMessageConfig_init_default                                                                 \
     {                                                                                                                            \
@@ -569,7 +604,7 @@ extern "C" {
     }
 #define meshtastic_ModuleConfig_DetectionSensorConfig_init_zero                                                                  \
     {                                                                                                                            \
-        0, 0, 0, 0, "", 0, 0, 0                                                                                                  \
+        0, 0, 0, 0, "", 0, _meshtastic_ModuleConfig_DetectionSensorConfig_TriggerType_MIN, 0                                     \
     }
 #define meshtastic_ModuleConfig_AudioConfig_init_zero                                                                            \
     {                                                                                                                            \
@@ -598,7 +633,7 @@ extern "C" {
     }
 #define meshtastic_ModuleConfig_TelemetryConfig_init_zero                                                                        \
     {                                                                                                                            \
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0                                                                                             \
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                                                                                    \
     }
 #define meshtastic_ModuleConfig_CannedMessageConfig_init_zero                                                                    \
     {                                                                                                                            \
@@ -637,7 +672,7 @@ extern "C" {
 #define meshtastic_ModuleConfig_DetectionSensorConfig_send_bell_tag 4
 #define meshtastic_ModuleConfig_DetectionSensorConfig_name_tag 5
 #define meshtastic_ModuleConfig_DetectionSensorConfig_monitor_pin_tag 6
-#define meshtastic_ModuleConfig_DetectionSensorConfig_detection_triggered_high_tag 7
+#define meshtastic_ModuleConfig_DetectionSensorConfig_detection_trigger_type_tag 7
 #define meshtastic_ModuleConfig_DetectionSensorConfig_use_pullup_tag 8
 #define meshtastic_ModuleConfig_AudioConfig_codec2_enabled_tag 1
 #define meshtastic_ModuleConfig_AudioConfig_ptt_pin_tag 2
@@ -692,6 +727,9 @@ extern "C" {
 #define meshtastic_ModuleConfig_TelemetryConfig_power_measurement_enabled_tag 8
 #define meshtastic_ModuleConfig_TelemetryConfig_power_update_interval_tag 9
 #define meshtastic_ModuleConfig_TelemetryConfig_power_screen_enabled_tag 10
+#define meshtastic_ModuleConfig_TelemetryConfig_health_measurement_enabled_tag 11
+#define meshtastic_ModuleConfig_TelemetryConfig_health_update_interval_tag 12
+#define meshtastic_ModuleConfig_TelemetryConfig_health_screen_enabled_tag 13
 #define meshtastic_ModuleConfig_CannedMessageConfig_rotary1_enabled_tag 1
 #define meshtastic_ModuleConfig_CannedMessageConfig_inputbroker_pin_a_tag 2
 #define meshtastic_ModuleConfig_CannedMessageConfig_inputbroker_pin_b_tag 3
@@ -802,7 +840,7 @@ extern "C" {
     X(a, STATIC, SINGULAR, BOOL, send_bell, 4)                                                                                   \
     X(a, STATIC, SINGULAR, STRING, name, 5)                                                                                      \
     X(a, STATIC, SINGULAR, UINT32, monitor_pin, 6)                                                                               \
-    X(a, STATIC, SINGULAR, BOOL, detection_triggered_high, 7)                                                                    \
+    X(a, STATIC, SINGULAR, UENUM, detection_trigger_type, 7)                                                                     \
     X(a, STATIC, SINGULAR, BOOL, use_pullup, 8)
 #define meshtastic_ModuleConfig_DetectionSensorConfig_CALLBACK NULL
 #define meshtastic_ModuleConfig_DetectionSensorConfig_DEFAULT NULL
@@ -884,7 +922,10 @@ extern "C" {
     X(a, STATIC, SINGULAR, UINT32, air_quality_interval, 7)                                                                      \
     X(a, STATIC, SINGULAR, BOOL, power_measurement_enabled, 8)                                                                   \
     X(a, STATIC, SINGULAR, UINT32, power_update_interval, 9)                                                                     \
-    X(a, STATIC, SINGULAR, BOOL, power_screen_enabled, 10)
+    X(a, STATIC, SINGULAR, BOOL, power_screen_enabled, 10)                                                                       \
+    X(a, STATIC, SINGULAR, BOOL, health_measurement_enabled, 11)                                                                 \
+    X(a, STATIC, SINGULAR, UINT32, health_update_interval, 12)                                                                   \
+    X(a, STATIC, SINGULAR, BOOL, health_screen_enabled, 13)
 #define meshtastic_ModuleConfig_TelemetryConfig_CALLBACK NULL
 #define meshtastic_ModuleConfig_TelemetryConfig_DEFAULT NULL
 
@@ -969,7 +1010,7 @@ extern const pb_msgdesc_t meshtastic_RemoteHardwarePin_msg;
 #define meshtastic_ModuleConfig_RemoteHardwareConfig_size 96
 #define meshtastic_ModuleConfig_SerialConfig_size 28
 #define meshtastic_ModuleConfig_StoreForwardConfig_size 24
-#define meshtastic_ModuleConfig_TelemetryConfig_size 36
+#define meshtastic_ModuleConfig_TelemetryConfig_size 46
 #define meshtastic_ModuleConfig_size 257
 #define meshtastic_RemoteHardwarePin_size 21
 
