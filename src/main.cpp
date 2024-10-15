@@ -6,7 +6,8 @@
 #include "UARTClient.h"
 
 // this is pulled in by the device-ui library
-const char *firmware_version = "2.5.0";
+const char *firmware_version = "2.5.7";
+static char connectionString[40];
 
 #ifdef USE_DUMMY_SERIAL
 class DummyClient : public IClientBase
@@ -51,14 +52,16 @@ void setup()
 #endif
 
 #ifndef USE_SERIAL0
+#ifdef WAIT_FOR_SERIAL0
     delay(2000);
     Serial.begin(115200);
     time_t timeout = millis();
     while (!Serial && (millis() - timeout) < 2000)
         ;
+#endif
     logger.setDebugLevel(ESP_LOG_VERBOSE); // use ESP_LOG_VERBOSE for trace category
 #else
-    logger.setDebugLevel(ESP_LOG_NONE);
+    logger.setDebugLevel(ESP_LOG_NONE); // do not log when connected over serial0
 #endif
 
     ILOG_DEBUG("\n*** SquareLine Studio (LovyanGFX) TFT GUI ***\n");
@@ -76,6 +79,7 @@ void setup()
 
     screen = &DeviceScreen::create();
     screen->init(&serial);
+    sprintf(connectionString, "==> connect %s !!!", serial.getConnectionInfo());
 
 #ifdef ARDUINO_ARCH_ESP32
     ILOG_DEBUG("Free heap : %8d bytes\n\r", ESP.getFreeHeap());
@@ -88,6 +92,11 @@ void setup()
 /*** main loop ***/
 void loop()
 {
+    if (serial.isActive()) {
+        firmware_version = "Connected!";
+    } else {
+        firmware_version = connectionString;
+    }
     screen->task_handler();
     delay(5);
 }
