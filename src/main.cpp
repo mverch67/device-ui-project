@@ -25,7 +25,8 @@ class DummyClient : public IClientBase
         return dummy;
     }
     ~DummyClient(){};
-
+    bool isActive(void) const {}
+    const char *getConnectionInfo(void) const {}
 } serial;
 #else
 UARTClient serial;
