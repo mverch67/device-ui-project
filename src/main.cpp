@@ -26,7 +26,7 @@ class DummyClient : public IClientBase
     }
     ~DummyClient(){};
     bool isActive(void) const {}
-    const char *getConnectionInfo(void) const {}
+    const char *getConnectionInfo(void) const { return "<undefined>"; }
 } serial;
 #else
 UARTClient serial;
@@ -65,7 +65,7 @@ void setup()
     logger.setDebugLevel(ESP_LOG_NONE); // do not log when connected over serial0
 #endif
 
-    ILOG_DEBUG("\n*** SquareLine Studio (LovyanGFX) TFT GUI ***\n");
+    ILOG_DEBUG("\n*** EEZ-Studio (LovyanGFX) TFT GUI ***\n");
 #ifdef ARDUINO_ARCH_ESP32
     uint64_t chipid;
     chipid = ESP.getEfuseMac(); // The chip ID is essentially its MAC address(length: 6 bytes).
