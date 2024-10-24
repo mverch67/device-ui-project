@@ -25,7 +25,7 @@ class DummyClient : public IClientBase
         return dummy;
     }
     ~DummyClient(){};
-    bool isActive(void) const {}
+    bool isActive(void) const { return false; }
     const char *getConnectionInfo(void) const { return "<undefined>"; }
 } serial;
 #else
@@ -55,7 +55,9 @@ void setup()
 #ifndef USE_SERIAL0
 #ifdef WAIT_FOR_SERIAL0
     delay(2000);
+#endif
     Serial.begin(115200);
+#ifdef WAIT_FOR_SERIAL0
     time_t timeout = millis();
     while (!Serial && (millis() - timeout) < 2000)
         ;
