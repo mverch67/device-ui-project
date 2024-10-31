@@ -3,6 +3,7 @@
 
 #ifndef PB_MESHTASTIC_MESHTASTIC_CONFIG_PB_H_INCLUDED
 #define PB_MESHTASTIC_MESHTASTIC_CONFIG_PB_H_INCLUDED
+#include "meshtastic/device_ui.pb.h"
 #include <pb.h>
 
 #if PB_PROTO_HEADER_VERSION != 40
@@ -77,7 +78,10 @@ typedef enum _meshtastic_Config_DeviceConfig_RebroadcastMode {
     meshtastic_Config_DeviceConfig_RebroadcastMode_KNOWN_ONLY = 3,
     /* Only permitted for SENSOR, TRACKER and TAK_TRACKER roles, this will inhibit all rebroadcasts, not unlike CLIENT_MUTE role.
      */
-    meshtastic_Config_DeviceConfig_RebroadcastMode_NONE = 4
+    meshtastic_Config_DeviceConfig_RebroadcastMode_NONE = 4,
+    /* Ignores packets from non-standard portnums such as: TAK, RangeTest, PaxCounter, etc.
+ Only rebroadcasts packets with standard portnums: NodeInfo, Text, Position, Telemetry, and Routing. */
+    meshtastic_Config_DeviceConfig_RebroadcastMode_CORE_PORTNUMS_ONLY = 5
 } meshtastic_Config_DeviceConfig_RebroadcastMode;
 
 /* Bit field of boolean configuration options, indicating which optional
@@ -577,6 +581,7 @@ typedef struct _meshtastic_Config {
         meshtastic_Config_BluetoothConfig bluetooth;
         meshtastic_Config_SecurityConfig security;
         meshtastic_Config_SessionkeyConfig sessionkey;
+        meshtastic_DeviceUIConfig device_ui;
     } payload_variant;
 } meshtastic_Config;
 
@@ -591,9 +596,9 @@ extern "C" {
     ((meshtastic_Config_DeviceConfig_Role)(meshtastic_Config_DeviceConfig_Role_TAK_TRACKER + 1))
 
 #define _meshtastic_Config_DeviceConfig_RebroadcastMode_MIN meshtastic_Config_DeviceConfig_RebroadcastMode_ALL
-#define _meshtastic_Config_DeviceConfig_RebroadcastMode_MAX meshtastic_Config_DeviceConfig_RebroadcastMode_NONE
+#define _meshtastic_Config_DeviceConfig_RebroadcastMode_MAX meshtastic_Config_DeviceConfig_RebroadcastMode_CORE_PORTNUMS_ONLY
 #define _meshtastic_Config_DeviceConfig_RebroadcastMode_ARRAYSIZE                                                                \
-    ((meshtastic_Config_DeviceConfig_RebroadcastMode)(meshtastic_Config_DeviceConfig_RebroadcastMode_NONE + 1))
+    ((meshtastic_Config_DeviceConfig_RebroadcastMode)(meshtastic_Config_DeviceConfig_RebroadcastMode_CORE_PORTNUMS_ONLY + 1))
 
 #define _meshtastic_Config_PositionConfig_PositionFlags_MIN meshtastic_Config_PositionConfig_PositionFlags_UNSET
 #define _meshtastic_Config_PositionConfig_PositionFlags_MAX meshtastic_Config_PositionConfig_PositionFlags_SPEED
@@ -870,6 +875,7 @@ extern "C" {
 #define meshtastic_Config_bluetooth_tag 7
 #define meshtastic_Config_security_tag 8
 #define meshtastic_Config_sessionkey_tag 9
+#define meshtastic_Config_device_ui_tag 10
 
 /* Struct field encoding specification for nanopb */
 #define meshtastic_Config_FIELDLIST(X, a)                                                                                        \
@@ -881,7 +887,8 @@ extern "C" {
     X(a, STATIC, ONEOF, MESSAGE, (payload_variant, lora, payload_variant.lora), 6)                                               \
     X(a, STATIC, ONEOF, MESSAGE, (payload_variant, bluetooth, payload_variant.bluetooth), 7)                                     \
     X(a, STATIC, ONEOF, MESSAGE, (payload_variant, security, payload_variant.security), 8)                                       \
-    X(a, STATIC, ONEOF, MESSAGE, (payload_variant, sessionkey, payload_variant.sessionkey), 9)
+    X(a, STATIC, ONEOF, MESSAGE, (payload_variant, sessionkey, payload_variant.sessionkey), 9)                                   \
+    X(a, STATIC, ONEOF, MESSAGE, (payload_variant, device_ui, payload_variant.device_ui), 10)
 #define meshtastic_Config_CALLBACK NULL
 #define meshtastic_Config_DEFAULT NULL
 #define meshtastic_Config_payload_variant_device_MSGTYPE meshtastic_Config_DeviceConfig
@@ -893,6 +900,7 @@ extern "C" {
 #define meshtastic_Config_payload_variant_bluetooth_MSGTYPE meshtastic_Config_BluetoothConfig
 #define meshtastic_Config_payload_variant_security_MSGTYPE meshtastic_Config_SecurityConfig
 #define meshtastic_Config_payload_variant_sessionkey_MSGTYPE meshtastic_Config_SessionkeyConfig
+#define meshtastic_Config_payload_variant_device_ui_MSGTYPE meshtastic_DeviceUIConfig
 
 #define meshtastic_Config_DeviceConfig_FIELDLIST(X, a)                                                                           \
     X(a, STATIC, SINGULAR, UENUM, role, 1)                                                                                       \

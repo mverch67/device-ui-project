@@ -15,5 +15,3 @@ PB_BIND(meshtastic_NodeInfoLite, meshtastic_NodeInfoLite, AUTO)
 PB_BIND(meshtastic_DeviceState, meshtastic_DeviceState, 2)
 
 PB_BIND(meshtastic_ChannelFile, meshtastic_ChannelFile, 2)
-
-PB_BIND(meshtastic_OEMStore, meshtastic_OEMStore, 2)

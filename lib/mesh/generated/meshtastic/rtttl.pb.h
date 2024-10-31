@@ -13,24 +13,28 @@
 /* Canned message module configuration. */
 typedef struct _meshtastic_RTTTLConfig {
     /* Ringtone for PWM Buzzer in RTTTL Format. */
-    char ringtone[230];
+    char ringtone[231];
 } meshtastic_RTTTLConfig;
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define meshtastic_RTTTLConfig_init_default      {""}
-#define meshtastic_RTTTLConfig_init_zero         {""}
+#define meshtastic_RTTTLConfig_init_default                                                                                      \
+    {                                                                                                                            \
+        ""                                                                                                                       \
+    }
+#define meshtastic_RTTTLConfig_init_zero                                                                                         \
+    {                                                                                                                            \
+        ""                                                                                                                       \
+    }
 
 /* Field tags (for use in manual encoding/decoding) */
-#define meshtastic_RTTTLConfig_ringtone_tag      1
+#define meshtastic_RTTTLConfig_ringtone_tag 1
 
 /* Struct field encoding specification for nanopb */
-#define meshtastic_RTTTLConfig_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, STRING,   ringtone,          1)
+#define meshtastic_RTTTLConfig_FIELDLIST(X, a) X(a, STATIC, SINGULAR, STRING, ringtone, 1)
 #define meshtastic_RTTTLConfig_CALLBACK NULL
 #define meshtastic_RTTTLConfig_DEFAULT NULL
 
@@ -41,7 +45,7 @@ extern const pb_msgdesc_t meshtastic_RTTTLConfig_msg;
 
 /* Maximum encoded size of messages (where known) */
 #define MESHTASTIC_MESHTASTIC_RTTTL_PB_H_MAX_SIZE meshtastic_RTTTLConfig_size
-#define meshtastic_RTTTLConfig_size              232
+#define meshtastic_RTTTLConfig_size 233
 
 #ifdef __cplusplus
 } /* extern "C" */
