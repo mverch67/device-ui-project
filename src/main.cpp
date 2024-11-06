@@ -5,8 +5,12 @@
 #include "Log.h"
 #include "UARTClient.h"
 
+#if defined(I2C_SDA) || defined(I2C_SDA1)
+#include "Wire.h"
+#endif
+
 // this is pulled in by the device-ui library
-const char *firmware_version = "2.5.7";
+const char *firmware_version = "2.5.11";
 static char connectionString[40];
 
 #ifdef USE_DUMMY_SERIAL
@@ -67,6 +71,15 @@ void setup()
     logger.setDebugLevel(ESP_LOG_NONE); // do not log when connected over serial0
 #endif
 
+#ifdef I2C_SDA
+    if (!Wire.begin(I2C_SDA, I2C_SCL, 400000))
+        ILOG_ERROR("\n*** Failed to access I2C0(%d, %d)\n", I2C_SDA, I2C_SCL);
+#endif
+#ifdef I2C_SDA1
+    if (!Wire.begin(I2C_SDA1, I2C_SCL1, 400000))
+        ILOG_ERROR("\n*** Failed to access I2C1(%d, %d)\n", I2C_SDA1, I2C_SCL1);
+#endif
+
     ILOG_DEBUG("\n*** EEZ-Studio (LovyanGFX) TFT GUI ***\n");
 #ifdef ARDUINO_ARCH_ESP32
     uint64_t chipid;
@@ -82,7 +95,7 @@ void setup()
 
     screen = &DeviceScreen::create();
     screen->init(&serial);
-    sprintf(connectionString, "==> connect %s !!!", serial.getConnectionInfo());
+    sprintf(connectionString, "==> connect %s <==", serial.getConnectionInfo());
 
 #ifdef ARDUINO_ARCH_ESP32
     ILOG_DEBUG("Free heap : %8d bytes\n\r", ESP.getFreeHeap());
