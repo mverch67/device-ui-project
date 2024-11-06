@@ -18,7 +18,7 @@
     "flash_mode": "qio",
     "hwids": [["0x1A86", "0x7523"]],
     "mcu": "esp32s3",
-    "variant": "esp32s3r8"
+    "variant": "esp32s3"
   },
   "connectivity": ["wifi", "bluetooth", "lora"],
   "debug": {
