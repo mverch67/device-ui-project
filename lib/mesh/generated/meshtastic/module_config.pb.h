@@ -153,8 +153,11 @@ typedef struct _meshtastic_ModuleConfig_NeighborInfoConfig {
     /* Whether the Module is enabled */
     bool enabled;
     /* Interval in seconds of how often we should try to send our
- Neighbor Info to the mesh */
+ Neighbor Info (minimum is 14400, i.e., 4 hours) */
     uint32_t update_interval;
+    /* Whether in addition to sending it to MQTT and the PhoneAPI, our NeighborInfo should be transmitted over LoRa.
+ Note that this is not available on a channel with default key and name. */
+    bool transmit_over_lora;
 } meshtastic_ModuleConfig_NeighborInfoConfig;
 
 /* Detection Sensor Module Config */
@@ -526,7 +529,7 @@ extern "C" {
     }
 #define meshtastic_ModuleConfig_NeighborInfoConfig_init_default                                                                  \
     {                                                                                                                            \
-        0, 0                                                                                                                     \
+        0, 0, 0                                                                                                                  \
     }
 #define meshtastic_ModuleConfig_DetectionSensorConfig_init_default                                                               \
     {                                                                                                                            \
@@ -600,7 +603,7 @@ extern "C" {
     }
 #define meshtastic_ModuleConfig_NeighborInfoConfig_init_zero                                                                     \
     {                                                                                                                            \
-        0, 0                                                                                                                     \
+        0, 0, 0                                                                                                                  \
     }
 #define meshtastic_ModuleConfig_DetectionSensorConfig_init_zero                                                                  \
     {                                                                                                                            \
@@ -666,6 +669,7 @@ extern "C" {
 #define meshtastic_ModuleConfig_MQTTConfig_map_report_settings_tag 11
 #define meshtastic_ModuleConfig_NeighborInfoConfig_enabled_tag 1
 #define meshtastic_ModuleConfig_NeighborInfoConfig_update_interval_tag 2
+#define meshtastic_ModuleConfig_NeighborInfoConfig_transmit_over_lora_tag 3
 #define meshtastic_ModuleConfig_DetectionSensorConfig_enabled_tag 1
 #define meshtastic_ModuleConfig_DetectionSensorConfig_minimum_broadcast_secs_tag 2
 #define meshtastic_ModuleConfig_DetectionSensorConfig_state_broadcast_secs_tag 3
@@ -829,7 +833,8 @@ extern "C" {
 
 #define meshtastic_ModuleConfig_NeighborInfoConfig_FIELDLIST(X, a)                                                               \
     X(a, STATIC, SINGULAR, BOOL, enabled, 1)                                                                                     \
-    X(a, STATIC, SINGULAR, UINT32, update_interval, 2)
+    X(a, STATIC, SINGULAR, UINT32, update_interval, 2)                                                                           \
+    X(a, STATIC, SINGULAR, BOOL, transmit_over_lora, 3)
 #define meshtastic_ModuleConfig_NeighborInfoConfig_CALLBACK NULL
 #define meshtastic_ModuleConfig_NeighborInfoConfig_DEFAULT NULL
 
@@ -1004,7 +1009,7 @@ extern const pb_msgdesc_t meshtastic_RemoteHardwarePin_msg;
 #define meshtastic_ModuleConfig_ExternalNotificationConfig_size 42
 #define meshtastic_ModuleConfig_MQTTConfig_size 254
 #define meshtastic_ModuleConfig_MapReportSettings_size 12
-#define meshtastic_ModuleConfig_NeighborInfoConfig_size 8
+#define meshtastic_ModuleConfig_NeighborInfoConfig_size 10
 #define meshtastic_ModuleConfig_PaxcounterConfig_size 30
 #define meshtastic_ModuleConfig_RangeTestConfig_size 10
 #define meshtastic_ModuleConfig_RemoteHardwareConfig_size 96
