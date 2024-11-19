@@ -49,6 +49,8 @@ typedef enum _meshtastic_Language {
     meshtastic_Language_DUTCH = 12,
     /* Greek */
     meshtastic_Language_GREEK = 13,
+    /* Norwegian */
+    meshtastic_Language_NORWEGIAN = 14,
     /* Simplified Chinese (experimental) */
     meshtastic_Language_SIMPLIFIED_CHINESE = 30,
     /* Traditional Chinese (experimental) */
@@ -84,6 +86,7 @@ typedef struct _meshtastic_NodeHighlight {
     char node_name[16];
 } meshtastic_NodeHighlight;
 
+typedef PB_BYTES_ARRAY_T(16) meshtastic_DeviceUIConfig_calibration_data_t;
 typedef struct _meshtastic_DeviceUIConfig {
     /* A version integer used to invalidate saved files when we make incompatible changes. */
     uint32_t version;
@@ -109,6 +112,8 @@ typedef struct _meshtastic_DeviceUIConfig {
     /* Node list highlightening */
     bool has_node_highlight;
     meshtastic_NodeHighlight node_highlight;
+    /* 8 integers for screen calibration data */
+    meshtastic_DeviceUIConfig_calibration_data_t calibration_data;
 } meshtastic_DeviceUIConfig;
 
 #ifdef __cplusplus
@@ -131,7 +136,13 @@ extern "C" {
 #define meshtastic_DeviceUIConfig_init_default                                                                                   \
     {                                                                                                                            \
         0, 0, 0, 0, 0, 0, _meshtastic_Theme_MIN, 0, 0, 0, _meshtastic_Language_MIN, false, meshtastic_NodeFilter_init_default,   \
-            false, meshtastic_NodeHighlight_init_default                                                                         \
+            false, meshtastic_NodeHighlight_init_default,                                                                        \
+        {                                                                                                                        \
+            0,                                                                                                                   \
+            {                                                                                                                    \
+                0                                                                                                                \
+            }                                                                                                                    \
+        }                                                                                                                        \
     }
 #define meshtastic_NodeFilter_init_default                                                                                       \
     {                                                                                                                            \
@@ -144,7 +155,13 @@ extern "C" {
 #define meshtastic_DeviceUIConfig_init_zero                                                                                      \
     {                                                                                                                            \
         0, 0, 0, 0, 0, 0, _meshtastic_Theme_MIN, 0, 0, 0, _meshtastic_Language_MIN, false, meshtastic_NodeFilter_init_zero,      \
-            false, meshtastic_NodeHighlight_init_zero                                                                            \
+            false, meshtastic_NodeHighlight_init_zero,                                                                           \
+        {                                                                                                                        \
+            0,                                                                                                                   \
+            {                                                                                                                    \
+                0                                                                                                                \
+            }                                                                                                                    \
+        }                                                                                                                        \
     }
 #define meshtastic_NodeFilter_init_zero                                                                                          \
     {                                                                                                                            \
@@ -180,6 +197,7 @@ extern "C" {
 #define meshtastic_DeviceUIConfig_language_tag 11
 #define meshtastic_DeviceUIConfig_node_filter_tag 12
 #define meshtastic_DeviceUIConfig_node_highlight_tag 13
+#define meshtastic_DeviceUIConfig_calibration_data_tag 14
 
 /* Struct field encoding specification for nanopb */
 #define meshtastic_DeviceUIConfig_FIELDLIST(X, a)                                                                                \
@@ -195,7 +213,8 @@ extern "C" {
     X(a, STATIC, SINGULAR, UINT32, ring_tone_id, 10)                                                                             \
     X(a, STATIC, SINGULAR, UENUM, language, 11)                                                                                  \
     X(a, STATIC, OPTIONAL, MESSAGE, node_filter, 12)                                                                             \
-    X(a, STATIC, OPTIONAL, MESSAGE, node_highlight, 13)
+    X(a, STATIC, OPTIONAL, MESSAGE, node_highlight, 13)                                                                          \
+    X(a, STATIC, SINGULAR, BYTES, calibration_data, 14)
 #define meshtastic_DeviceUIConfig_CALLBACK NULL
 #define meshtastic_DeviceUIConfig_DEFAULT NULL
 #define meshtastic_DeviceUIConfig_node_filter_MSGTYPE meshtastic_NodeFilter
@@ -231,7 +250,7 @@ extern const pb_msgdesc_t meshtastic_NodeHighlight_msg;
 
 /* Maximum encoded size of messages (where known) */
 #define MESHTASTIC_MESHTASTIC_DEVICE_UI_PB_H_MAX_SIZE meshtastic_DeviceUIConfig_size
-#define meshtastic_DeviceUIConfig_size 99
+#define meshtastic_DeviceUIConfig_size 117
 #define meshtastic_NodeFilter_size 36
 #define meshtastic_NodeHighlight_size 25
 
