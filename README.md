@@ -9,7 +9,7 @@
 
 ## Overview
 
-[Meshtastic](https://meshtastic.org) device-ui project for TFT screens
+[Meshtastic](https://meshtastic.org) [device-ui](https://github.com/meshtastic/device-ui) project for TFT screens
 
 ## Stats
 
