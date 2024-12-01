@@ -215,6 +215,9 @@ typedef enum _meshtastic_HardwareModel {
     meshtastic_HardwareModel_MS24SF1 = 82,
     /* Lilygo TLora-C6 with the new ESP32-C6 MCU */
     meshtastic_HardwareModel_TLORA_C6 = 83,
+    /* WisMesh Tap
+ RAK-4631 w/ TFT in injection modled case */
+    meshtastic_HardwareModel_WISMESH_TAP = 84,
     /* ------------------------------------------------------------------------------------------------------------------------------------------
  Reserved ID For developing private Ports. These will show up in live traffic sparsely, so we can use a high number. Keep it
  within 8 bits.
@@ -231,7 +234,7 @@ typedef enum _meshtastic_Constants {
     /* From mesh.options
  note: this payload length is ONLY the bytes that are sent inside of the Data protobuf (excluding protobuf overhead). The 16 byte
  header is outside of this envelope */
-    meshtastic_Constants_DATA_PAYLOAD_LEN = 237
+    meshtastic_Constants_DATA_PAYLOAD_LEN = 233
 } meshtastic_Constants;
 
 /* Error codes for critical errors
@@ -609,7 +612,7 @@ typedef struct _meshtastic_Routing {
     };
 } meshtastic_Routing;
 
-typedef PB_BYTES_ARRAY_T(237) meshtastic_Data_payload_t;
+typedef PB_BYTES_ARRAY_T(233) meshtastic_Data_payload_t;
 /* (Formerly called SubPacket)
  The payload portion fo a packet, this is the actual bytes that are sent
  inside a radio packet (because from/to are broken out by the comms library) */
@@ -760,6 +763,12 @@ typedef struct _meshtastic_MeshPacket {
     meshtastic_MeshPacket_public_key_t public_key;
     /* Indicates whether the packet was en/decrypted using PKI */
     bool pki_encrypted;
+    /* Last byte of the node number of the node that should be used as the next hop in routing.
+ Set by the firmware internally, clients are not supposed to set this. */
+    uint8_t next_hop;
+    /* Last byte of the node number of the node that will relay/relayed this packet.
+ Set by the firmware internally, clients are not supposed to set this. */
+    uint8_t relay_node;
 } meshtastic_MeshPacket;
 
 /* The bluetooth to device link:
@@ -882,7 +891,7 @@ typedef struct _meshtastic_FileInfo {
     uint32_t size_bytes;
 } meshtastic_FileInfo;
 
-typedef PB_BYTES_ARRAY_T(237) meshtastic_Compressed_data_t;
+typedef PB_BYTES_ARRAY_T(233) meshtastic_Compressed_data_t;
 /* Compressed message payload */
 typedef struct _meshtastic_Compressed {
     /* PortNum to determine the how to handle the compressed payload. */
@@ -1191,7 +1200,7 @@ extern "C" {
 #define meshtastic_MeshPacket_init_default                                                                                       \
     {                                                                                                                            \
         0, 0, 0, 0, {meshtastic_Data_init_default}, 0, 0, 0, 0, 0, _meshtastic_MeshPacket_Priority_MIN, 0,                       \
-            _meshtastic_MeshPacket_Delayed_MIN, 0, 0, {0, {0}}, 0                                                                \
+            _meshtastic_MeshPacket_Delayed_MIN, 0, 0, {0, {0}}, 0, 0, 0                                                          \
     }
 #define meshtastic_NodeInfo_init_default                                                                                         \
     {                                                                                                                            \
@@ -1335,7 +1344,7 @@ extern "C" {
 #define meshtastic_MeshPacket_init_zero                                                                                          \
     {                                                                                                                            \
         0, 0, 0, 0, {meshtastic_Data_init_zero}, 0, 0, 0, 0, 0, _meshtastic_MeshPacket_Priority_MIN, 0,                          \
-            _meshtastic_MeshPacket_Delayed_MIN, 0, 0, {0, {0}}, 0                                                                \
+            _meshtastic_MeshPacket_Delayed_MIN, 0, 0, {0, {0}}, 0, 0, 0                                                          \
     }
 #define meshtastic_NodeInfo_init_zero                                                                                            \
     {                                                                                                                            \
@@ -1513,6 +1522,8 @@ extern "C" {
 #define meshtastic_MeshPacket_hop_start_tag 15
 #define meshtastic_MeshPacket_public_key_tag 16
 #define meshtastic_MeshPacket_pki_encrypted_tag 17
+#define meshtastic_MeshPacket_next_hop_tag 18
+#define meshtastic_MeshPacket_relay_node_tag 19
 #define meshtastic_NodeInfo_num_tag 1
 #define meshtastic_NodeInfo_user_tag 2
 #define meshtastic_NodeInfo_position_tag 3
@@ -1707,7 +1718,9 @@ extern "C" {
     X(a, STATIC, SINGULAR, BOOL, via_mqtt, 14)                                                                                   \
     X(a, STATIC, SINGULAR, UINT32, hop_start, 15)                                                                                \
     X(a, STATIC, SINGULAR, BYTES, public_key, 16)                                                                                \
-    X(a, STATIC, SINGULAR, BOOL, pki_encrypted, 17)
+    X(a, STATIC, SINGULAR, BOOL, pki_encrypted, 17)                                                                              \
+    X(a, STATIC, SINGULAR, UINT32, next_hop, 18)                                                                                 \
+    X(a, STATIC, SINGULAR, UINT32, relay_node, 19)
 #define meshtastic_MeshPacket_CALLBACK NULL
 #define meshtastic_MeshPacket_DEFAULT NULL
 #define meshtastic_MeshPacket_payload_variant_decoded_MSGTYPE meshtastic_Data
@@ -1949,14 +1962,14 @@ extern const pb_msgdesc_t meshtastic_ChunkedPayloadResponse_msg;
 #define MESHTASTIC_MESHTASTIC_MESH_PB_H_MAX_SIZE meshtastic_FromRadio_size
 #define meshtastic_ChunkedPayload_size 245
 #define meshtastic_ClientNotification_size 415
-#define meshtastic_Compressed_size 243
-#define meshtastic_Data_size 273
+#define meshtastic_Compressed_size 239
+#define meshtastic_Data_size 269
 #define meshtastic_DeviceMetadata_size 54
 #define meshtastic_FileInfo_size 236
 #define meshtastic_FromRadio_size 510
 #define meshtastic_Heartbeat_size 0
 #define meshtastic_LogRecord_size 426
-#define meshtastic_MeshPacket_size 367
+#define meshtastic_MeshPacket_size 371
 #define meshtastic_MqttClientProxyMessage_size 501
 #define meshtastic_MyNodeInfo_size 77
 #define meshtastic_NeighborInfo_size 258
