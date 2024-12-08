@@ -73,24 +73,23 @@ void setup()
 
 #ifdef I2C_SDA
     if (!Wire.begin(I2C_SDA, I2C_SCL, 400000))
-        ILOG_ERROR("\n*** Failed to access I2C0(%d, %d)\n", I2C_SDA, I2C_SCL);
+        ILOG_ERROR("*** Failed to access I2C0(%d, %d)", I2C_SDA, I2C_SCL);
 #endif
 #ifdef I2C_SDA1
     if (!Wire.begin(I2C_SDA1, I2C_SCL1, 400000))
-        ILOG_ERROR("\n*** Failed to access I2C1(%d, %d)\n", I2C_SDA1, I2C_SCL1);
+        ILOG_ERROR("*** Failed to access I2C1(%d, %d)", I2C_SDA1, I2C_SCL1);
 #endif
 
-    ILOG_DEBUG("\n*** EEZ-Studio (LovyanGFX) TFT GUI ***\n");
+    ILOG_DEBUG("*** EEZ-Studio (LovyanGFX) TFT GUI ***");
 #ifdef ARDUINO_ARCH_ESP32
     uint64_t chipid;
     chipid = ESP.getEfuseMac(); // The chip ID is essentially its MAC address(length: 6 bytes).
-    ILOG_DEBUG("  ESP32 Chip ID = %04X\n", (uint16_t)(chipid >> 32)); // print High 2 bytes
-    ILOG_DEBUG("%08X\n\r", (uint32_t)chipid);                         // print Low 4bytes.
-    ILOG_DEBUG("  Flash size: %8d bytes\n\r", ESP.getFlashChipSize());
-    ILOG_DEBUG("  Heap size : %8d bytes\n\r", ESP.getHeapSize());
-    ILOG_DEBUG("  Free heap : %8d bytes\n\r", ESP.getFreeHeap());
-    ILOG_DEBUG("  PSRAM     : %8d bytes\n\r", ESP.getFreePsram());
-    ILOG_DEBUG("*****************************************\n");
+    ILOG_DEBUG("  ESP32 Chip ID = %04X %08X", (uint16_t)(chipid >> 32), (uint32_t)chipid);
+    ILOG_DEBUG("  Flash size: %8d bytes", ESP.getFlashChipSize());
+    ILOG_DEBUG("  Heap size : %8d bytes", ESP.getHeapSize());
+    ILOG_DEBUG("  Free heap : %8d bytes", ESP.getFreeHeap());
+    ILOG_DEBUG("  PSRAM     : %8d bytes", ESP.getFreePsram());
+    ILOG_DEBUG("*****************************************");
 #endif
 
     screen = &DeviceScreen::create();
@@ -98,11 +97,11 @@ void setup()
     sprintf(connectionString, "==> connect %s <==", serial.getConnectionInfo());
 
 #ifdef ARDUINO_ARCH_ESP32
-    ILOG_DEBUG("Free heap : %8d bytes\n\r", ESP.getFreeHeap());
-    ILOG_DEBUG("PSRAM     : %8d bytes\n\r", ESP.getFreePsram());
+    ILOG_DEBUG("Free heap : %8d bytes", ESP.getFreeHeap());
+    ILOG_DEBUG("PSRAM     : %8d bytes", ESP.getFreePsram());
 #endif
 
-    ILOG_DEBUG("Setup done.\n\r");
+    ILOG_DEBUG("Setup done.");
 }
 
 /*** main loop ***/
