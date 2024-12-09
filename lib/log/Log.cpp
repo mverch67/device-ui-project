@@ -8,7 +8,7 @@
 #define LOG_CRLF(LVL, TAG) esp_log_write(LVL, TAG, "\n")
 #elif defined(ARCH_PORTDUINO)
 #define LOG_FWD(LVL, TAG, FMT, ARG) vprintf(FMT, ARG)
-#define LOG_CRLF(LVL, TAG, FMT) printf("\n")
+#define LOG_CRLF(LVL, TAG) printf("\n")
 #define esp_log_level_set(...)
 #endif
 
