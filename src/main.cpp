@@ -4,13 +4,22 @@
 #include "DeviceScreen.h"
 #include "Log.h"
 #include "UARTClient.h"
+#if defined(ARCH_PORTDUINO)
+#include "PortduinoFS.h"
+#define FSCom PortduinoFS
+#define FSBegin() true
+#else
+#include "LittleFS.h"
+#define FSCom LittleFS
+#define FSBegin() FSCom.begin(true)
+#endif
 
 #if defined(I2C_SDA) || defined(I2C_SDA1)
 #include "Wire.h"
 #endif
 
 // this is pulled in by the device-ui library
-const char *firmware_version = "2.5.13";
+const char *firmware_version = "2.5.17";
 static char connectionString[40];
 
 #ifdef USE_DUMMY_SERIAL
@@ -91,6 +100,10 @@ void setup()
     ILOG_DEBUG("  PSRAM     : %8d bytes", ESP.getFreePsram());
     ILOG_DEBUG("*****************************************");
 #endif
+
+    if (!FSBegin()) {
+        ILOG_ERROR("LittleFS mount failed!");
+    }
 
     screen = &DeviceScreen::create();
     screen->init(&serial);
