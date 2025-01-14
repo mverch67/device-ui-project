@@ -1,9 +1,9 @@
 #ifndef PIO_UNIT_TESTING
 
 #include "Arduino.h"
-#include "DeviceScreen.h"
+#include "graphics/DeviceScreen.h"
 #include "Log.h"
-#include "UARTClient.h"
+#include "comms/UARTClient.h"
 #if defined(ARCH_PORTDUINO)
 #include "PortduinoFS.h"
 #define FSCom PortduinoFS
