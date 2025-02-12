@@ -5,15 +5,25 @@
 
 // static const uint8_t LED_BUILTIN = -1;
 
+#define SD_SPI_FREQUENCY 75000000U
+
+static const uint8_t RELAY_PIN = 40;
+
+static const uint8_t SPI_MOSI = 47;
+static const uint8_t SPI_SCK = 48;
+static const uint8_t SPI_MISO = 41;
+static const uint8_t SPI_CS = 42;
+static const uint8_t SDCARD_CS = SPI_CS;
+
 static const uint8_t TX = 43;
 static const uint8_t RX = 44;
 
 static const uint8_t SDA = 19;
 static const uint8_t SCL = 45;
 
-static const uint8_t SS = -1;
+static const uint8_t SS = 39;
 static const uint8_t MOSI = 47;
-static const uint8_t MISO = -1;
+static const uint8_t MISO = 41;
 static const uint8_t SCK = 48;
 
 static const uint8_t A0 = 1;

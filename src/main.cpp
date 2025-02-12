@@ -1,9 +1,11 @@
 #ifndef PIO_UNIT_TESTING
 
 #include "Arduino.h"
-#include "graphics/DeviceScreen.h"
 #include "Log.h"
+#include "SDCard.h"
 #include "comms/UARTClient.h"
+#include "graphics/DeviceScreen.h"
+
 #if defined(ARCH_PORTDUINO)
 #include "PortduinoFS.h"
 #define FSCom PortduinoFS
@@ -19,7 +21,7 @@
 #endif
 
 // this is pulled in by the device-ui library
-const char *firmware_version = "2.5.19";
+const char *firmware_version = "2.6";
 static char connectionString[40];
 
 #ifdef USE_DUMMY_SERIAL
@@ -88,6 +90,8 @@ void setup()
     if (!Wire.begin(I2C_SDA1, I2C_SCL1, 400000))
         ILOG_ERROR("*** Failed to access I2C1(%d, %d)", I2C_SDA1, I2C_SCL1);
 #endif
+
+    setupSDCard();
 
     ILOG_DEBUG("*** EEZ-Studio (LovyanGFX) TFT GUI ***");
 #ifdef ARDUINO_ARCH_ESP32
