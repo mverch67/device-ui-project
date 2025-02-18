@@ -3,7 +3,7 @@
 #include "Arduino.h"
 
 #ifndef ARCH_PORTDUINO
-#include "SD.h"
+// #include "SD.h"
 extern void setupSDCard();
 #else
 void setupSDCard() {}
