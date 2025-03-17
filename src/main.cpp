@@ -21,7 +21,7 @@
 #endif
 
 // this is pulled in by the device-ui library
-const char *firmware_version = "2.6";
+const char *firmware_version = "2.6.2";
 static char connectionString[40];
 
 #ifdef USE_DUMMY_SERIAL
@@ -91,9 +91,9 @@ void setup()
         ILOG_ERROR("*** Failed to access I2C1(%d, %d)", I2C_SDA1, I2C_SCL1);
 #endif
 
-    setupSDCard();
+    setupSDCard(); // note: done now also in device-ui (hot-swap)
 
-    ILOG_DEBUG("*** EEZ-Studio (LovyanGFX) TFT GUI ***");
+    ILOG_DEBUG("*** Meshtastic UI ***");
 #ifdef ARDUINO_ARCH_ESP32
     uint64_t chipid;
     chipid = ESP.getEfuseMac(); // The chip ID is essentially its MAC address(length: 6 bytes).

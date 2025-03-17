@@ -18,7 +18,7 @@ fs::SDFS &sd = SD;
 
 void setupSDCard()
 {
-#if HAS_SDCARD
+#ifdef HAS_SDCARD
 #ifdef HAS_SD_MMC
     sd.setPins(SD_SCLK_PIN, SD_MOSI_PIN, SD_MISO_PIN);
     if (!sd.begin("/sdcard", true)) {
