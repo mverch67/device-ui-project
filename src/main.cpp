@@ -21,7 +21,7 @@
 #endif
 
 // this is pulled in by the device-ui library
-const char *firmware_version = "2.6.2";
+const char *firmware_version = "2.6.4";
 static char connectionString[40];
 
 #ifdef USE_DUMMY_SERIAL
@@ -124,10 +124,12 @@ void setup()
 /*** main loop ***/
 void loop()
 {
-    if (serial.isActive()) {
-        firmware_version = "Connected!";
-    } else {
-        firmware_version = connectionString;
+    if (millis() > 3000) {
+        if (serial.isActive()) {
+            firmware_version = "Connected!";
+        } else {
+            firmware_version = connectionString;
+        }
     }
     screen->task_handler();
     delay(5);
