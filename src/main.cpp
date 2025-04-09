@@ -21,7 +21,7 @@
 #endif
 
 // this is pulled in by the device-ui library
-const char *firmware_version = "2.6.4";
+const char *firmware_version = "2.6.5";
 static char connectionString[40];
 
 #ifdef USE_DUMMY_SERIAL
