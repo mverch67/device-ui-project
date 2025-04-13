@@ -7,8 +7,16 @@
 #ifdef HAS_SD_MMC
 #include "SD_MMC.h"
 fs::SDMMCFS &sd = SD_MMC;
+static SPIClass &SDHandler = SPI;
 #else
 #include "SD.h"
+#ifdef SDCARD_USE_SPI1
+SPIClass SPI1(HSPI);
+static SPIClass &SDHandler = SPI1;
+#else
+static SPIClass &SDHandler = SPI;
+#endif
+
 fs::SDFS &sd = SD;
 #endif
 
@@ -26,7 +34,7 @@ void setupSDCard()
         return;
     }
 #else
-    SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
+    SDHandler.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
     if (!sd.begin(SDCARD_CS, SPI, SD_SPI_FREQUENCY)) {
         ILOG_DEBUG("No SD card detected");
         return;
