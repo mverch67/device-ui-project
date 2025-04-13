@@ -35,7 +35,7 @@ void setupSDCard()
     }
 #else
     SDHandler.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
-    if (!sd.begin(SDCARD_CS, SPI, SD_SPI_FREQUENCY)) {
+    if (!sd.begin(SDCARD_CS, SDHandler, SD_SPI_FREQUENCY)) {
         ILOG_DEBUG("No SD card detected");
         return;
     }
