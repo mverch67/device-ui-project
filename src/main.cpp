@@ -102,6 +102,7 @@ void setup()
     ILOG_DEBUG("  Heap size : %8d bytes", ESP.getHeapSize());
     ILOG_DEBUG("  Free heap : %8d bytes", ESP.getFreeHeap());
     ILOG_DEBUG("  PSRAM     : %8d bytes", ESP.getFreePsram());
+    ILOG_DEBUG("  PSRAM max : %8d bytes", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
     ILOG_DEBUG("*****************************************");
 #endif
 

@@ -9,13 +9,19 @@
 #define USB_PRODUCT "WT32-SC01 Plus"
 #define USB_SERIAL ""
 
-#define EXTERNAL_NUM_INTERRUPTS 46
-#define NUM_DIGITAL_PINS        17
-#define NUM_ANALOG_INPUTS       9
+// #define EXTERNAL_NUM_INTERRUPTS 46
+// #define NUM_DIGITAL_PINS        17
+// #define NUM_ANALOG_INPUTS       9
 
-#define analogInputToDigitalPin(p)  (((p)<20)?(analogChannelToDigitalPin(p)):-1)
-#define digitalPinToInterrupt(p)    (((p)<48)?(p):-1)
-#define digitalPinHasPWM(p)         (p < 46)
+// #define analogInputToDigitalPin(p)  (((p)<20)?(analogChannelToDigitalPin(p)):-1)
+// #define digitalPinToInterrupt(p)    (((p)<48)?(p):-1)
+// #define digitalPinHasPWM(p)         (p < 46)
+
+static const uint8_t SPI_MOSI = 40;
+static const uint8_t SPI_SCK = 39;
+static const uint8_t SPI_MISO = 38;
+static const uint8_t SPI_CS = 41;
+static const uint8_t SDCARD_CS = SPI_CS;
 
 static const uint8_t TX = 43;
 static const uint8_t RX = 44;
@@ -23,12 +29,12 @@ static const uint8_t RX = 44;
 static const uint8_t SDA = 8;
 static const uint8_t SCL = 9;
 
-static const uint8_t SS    = 34;
-static const uint8_t MOSI  = 35;
-static const uint8_t MISO  = 37;
-static const uint8_t SDO  = 35;
-static const uint8_t SDI  = 37;
-static const uint8_t SCK   = 36;
+static const uint8_t SS = 34;
+static const uint8_t MOSI = 35;
+static const uint8_t MISO = 37;
+static const uint8_t SDO = 35;
+static const uint8_t SDI = 37;
+static const uint8_t SCK = 36;
 
 static const uint8_t A0 = 1;
 static const uint8_t A1 = 2;
