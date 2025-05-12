@@ -3,11 +3,13 @@
 #include "Arduino.h"
 #include "Log.h"
 #include "SDCard.h"
+#include "comms/EthClient.h"
 #include "comms/UARTClient.h"
 #include "graphics/DeviceScreen.h"
 
 #if defined(ARCH_PORTDUINO)
 #include "PortduinoFS.h"
+#include <thread>
 #define FSCom PortduinoFS
 #define FSBegin() true
 #else
@@ -21,7 +23,7 @@
 #endif
 
 // this is pulled in by the device-ui library
-const char *firmware_version = "2.6.5";
+const char *firmware_version = "2.6.8";
 static char connectionString[40];
 
 #ifdef USE_DUMMY_SERIAL
@@ -40,11 +42,11 @@ class DummyClient : public IClientBase
         return dummy;
     }
     ~DummyClient(){};
-    bool isActive(void) const { return false; }
-    const char *getConnectionInfo(void) const { return "<undefined>"; }
+    //    bool isActive(void) const { return false; }
+    //    const char *getConnectionInfo(void) const { return "<undefined>"; }
 } serial;
 #else
-UARTClient serial;
+IClientBase *client = nullptr;
 #endif
 
 DeviceScreen *screen = nullptr;
@@ -110,13 +112,26 @@ void setup()
         ILOG_ERROR("LittleFS mount failed!");
     }
 
+    if (1) {
+        byte mac[] = {0xDE, 0xAD, 0xBE, 0xEE, 0xEE, 0xEF};
+        client = new EthClient(mac, IPAddress(192, 168, 1, 111), IPAddress(127, 0, 0, 1));
+    } else {
+        client = new UARTClient();
+    }
+
     screen = &DeviceScreen::create();
-    screen->init(&serial);
-    sprintf(connectionString, "==> connect %s <==", serial.getConnectionInfo());
+    screen->init(client);
+    // sprintf(connectionString, "==> connect %s <==", serial->getConnectionInfo());
 
 #ifdef ARDUINO_ARCH_ESP32
     ILOG_DEBUG("Free heap : %8d bytes", ESP.getFreeHeap());
     ILOG_DEBUG("PSRAM     : %8d bytes", ESP.getFreePsram());
+#endif
+
+#ifdef ARCH_PORTDUINO
+    // create separate thread to handle lvgl X11 GUI simulation
+    extern void tft_task_handler(void *param = nullptr);
+    std::thread *tft_task = new std::thread([] { tft_task_handler(); });
 #endif
 
     ILOG_DEBUG("Setup done.");
@@ -125,13 +140,15 @@ void setup()
 /*** main loop ***/
 void loop()
 {
+#if 0
     if (millis() > 3000) {
-        if (serial.isActive()) {
+        if (serial->isActive()) {
             firmware_version = "Connected!";
         } else {
             firmware_version = connectionString;
         }
     }
+#endif
     screen->task_handler();
     delay(5);
 }
