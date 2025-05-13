@@ -24,7 +24,7 @@
 
 // this is pulled in by the device-ui library
 const char *firmware_version = "2.6.8";
-static char connectionString[40];
+const char *connectionString = "==> connect serial <==";
 
 #ifdef USE_DUMMY_SERIAL
 class DummyClient : public IClientBase
@@ -112,16 +112,14 @@ void setup()
         ILOG_ERROR("LittleFS mount failed!");
     }
 
-    if (1) {
-        byte mac[] = {0xDE, 0xAD, 0xBE, 0xEE, 0xEE, 0xEF};
-        client = new EthClient(mac, IPAddress(192, 168, 1, 111), IPAddress(127, 0, 0, 1));
-    } else {
-        client = new UARTClient();
-    }
+#ifdef ARCH_PORTDUINO
+    client = new EthClient();
+#else
+    client = new UARTClient();
+#endif
 
     screen = &DeviceScreen::create();
     screen->init(client);
-    // sprintf(connectionString, "==> connect %s <==", serial->getConnectionInfo());
 
 #ifdef ARDUINO_ARCH_ESP32
     ILOG_DEBUG("Free heap : %8d bytes", ESP.getFreeHeap());
@@ -140,15 +138,14 @@ void setup()
 /*** main loop ***/
 void loop()
 {
-#if 0
     if (millis() > 3000) {
-        if (serial->isActive()) {
+        if (client->isConnected()) {
             firmware_version = "Connected!";
         } else {
             firmware_version = connectionString;
         }
     }
-#endif
+
     screen->task_handler();
     delay(5);
 }
