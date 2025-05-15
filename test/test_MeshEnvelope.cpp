@@ -1,4 +1,4 @@
-#include "MeshEnvelope.h"
+#include "comms/MeshEnvelope.h"
 #include <unity.h>
 
 uint8_t buffer[512];
