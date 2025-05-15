@@ -95,7 +95,7 @@ void setup()
 
     setupSDCard(); // note: done now also in device-ui (hot-swap)
 
-    ILOG_DEBUG("*** Meshtastic UI ***");
+    ILOG_INFO("\n//\ E S H T /\ S T / C   U I\n");
 #ifdef ARDUINO_ARCH_ESP32
     uint64_t chipid;
     chipid = ESP.getEfuseMac(); // The chip ID is essentially its MAC address(length: 6 bytes).
@@ -113,12 +113,28 @@ void setup()
     }
 
 #ifdef ARCH_PORTDUINO
-    client = new EthClient();
+    const char *hostname = getenv("MUI_SERVER");
+    if (hostname == nullptr) {
+        client = new EthClient();
+    } else {
+        client = new EthClient(hostname);
+    }
+    int16_t x = 480;
+    int16_t y = 480;
+    const char *size = getenv("MUI_SIZE");
+    if (size != nullptr) {
+        sscanf(size, "%" PRId16 "x%" PRId16, &x, &y);
+    }
+    if (x < 320 || x > 800)
+        x = 480;
+    if (y < 240 || y > 800)
+        y = 480;
+    screen = &DeviceScreen::create(DisplayDriverConfig(DisplayDriverConfig::device_t::X11, x, y));
 #else
     client = new UARTClient();
+    screen = &DeviceScreen::create();
 #endif
 
-    screen = &DeviceScreen::create();
     screen->init(client);
 
 #ifdef ARDUINO_ARCH_ESP32
@@ -147,14 +163,17 @@ void loop()
     }
 
     screen->task_handler();
-    delay(5);
+    screen->sleep(5);
 }
 
 #if defined(ARCH_PORTDUINO)
+extern "C" void lv_tick_inc(uint32_t tick_period);
 void tft_task_handler(void *)
 {
-    screen->task_handler();
-    delay(5);
+    while (true) {
+        screen->task_handler();
+        screen->sleep(5);
+    }
 }
 #endif
 
