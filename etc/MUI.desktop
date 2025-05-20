@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=2.6
+Type=Application
+Name=MUI
+Comment=Meshtastic UI Client
+Exec=native-mui
+Icon=MUI.png
+Terminal=false
+Type=Application
+Categories=Network,Utility
+
