@@ -53,6 +53,11 @@ DeviceScreen *screen = nullptr;
 
 void setup()
 {
+#if defined(__APPLE__)
+    pthread_setname_np("setup");
+#elif defined(__linux__)
+    pthread_setname_np(pthread_self(), "setup");
+#endif
 #ifdef KB_POWERON
     digitalWrite(KB_POWERON, HIGH);
     pinMode(KB_POWERON, OUTPUT);
@@ -79,7 +84,7 @@ void setup()
     while (!Serial && (millis() - timeout) < 2000)
         ;
 #endif
-    logger.setDebugLevel(ESP_LOG_VERBOSE); // use ESP_LOG_VERBOSE for trace category
+    logger.setDebugLevel(ESP_LOG_DEBUG); // use ESP_LOG_VERBOSE for trace category
 #else
     logger.setDebugLevel(ESP_LOG_NONE); // do not log when connected over serial0
 #endif
@@ -95,7 +100,7 @@ void setup()
 
     setupSDCard(); // note: done now also in device-ui (hot-swap)
 
-    ILOG_INFO("\n//\ E S H T /\ S T / C   U I\n");
+    ILOG_INFO("\n//\\ E S H T /\\ S T / C   U I\n");
 #ifdef ARDUINO_ARCH_ESP32
     uint64_t chipid;
     chipid = ESP.getEfuseMac(); // The chip ID is essentially its MAC address(length: 6 bytes).
@@ -144,14 +149,27 @@ void setup()
 
 #ifdef ARCH_PORTDUINO
     // create separate thread to handle lvgl X11 GUI simulation
+    // otherwise the GUI will slow down the main thread
     extern void tft_task_handler(void *param = nullptr);
-    std::thread *tft_task = new std::thread([] { tft_task_handler(); });
+    new std::thread([] {
+#ifdef __APPLE__
+        pthread_setname_np("tft");
+#else
+        pthread_setname_np(pthread_self(), "tft");
+#endif
+        tft_task_handler();
+    });
 #endif
 
     ILOG_DEBUG("Setup done.");
+#if defined(__APPLE__)
+    pthread_setname_np("loop");
+#elif defined(__linux__)
+    pthread_setname_np(pthread_self(), "loop");
+#endif
 }
 
-/*** main loop ***/
+#if defined(ARCH_ESP32)
 void loop()
 {
     if (millis() > 3000) {
@@ -166,15 +184,23 @@ void loop()
     screen->sleep(5);
 }
 
-#if defined(ARCH_PORTDUINO)
-extern "C" void lv_tick_inc(uint32_t tick_period);
+#elif defined(ARCH_PORTDUINO)
+void loop()
+{
+    delay(1000);
+    fflush(nullptr);
+}
+
 void tft_task_handler(void *)
 {
+    ILOG_INFO("tft_task_handler started");
     while (true) {
         screen->task_handler();
         screen->sleep(5);
     }
 }
+#else
+#error "Unsupported architecture"
 #endif
 
 #endif
