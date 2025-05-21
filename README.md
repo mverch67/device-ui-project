@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img alt="meshtastic" src="https://avatars.githubusercontent.com/u/61627050?s=200&v=4" width="80" height="80">
+<img alt="meshtastic" src="etc/MUI.png" width="80" height="80">
 
   <h1 align="center"> Meshtastic Standalone UI</h1>
   <p style="font-size:20px;" align="center">A versatile UI for the <a href="https://meshtastic.org">meshtastic® project</a> </p>
