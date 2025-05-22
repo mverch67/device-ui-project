@@ -24,7 +24,6 @@
 
 // this is pulled in by the device-ui library
 const char *firmware_version = "2.6.8";
-const char *connectionString = "==> connect serial <==";
 
 #ifdef USE_DUMMY_SERIAL
 class DummyClient : public IClientBase
@@ -42,8 +41,6 @@ class DummyClient : public IClientBase
         return dummy;
     }
     ~DummyClient(){};
-    //    bool isActive(void) const { return false; }
-    //    const char *getConnectionInfo(void) const { return "<undefined>"; }
 } serial;
 #else
 IClientBase *client = nullptr;
@@ -172,14 +169,6 @@ void setup()
 #if defined(ARCH_ESP32)
 void loop()
 {
-    if (millis() > 3000) {
-        if (client->isConnected()) {
-            firmware_version = "Connected!";
-        } else {
-            firmware_version = connectionString;
-        }
-    }
-
     screen->task_handler();
     screen->sleep(5);
 }
