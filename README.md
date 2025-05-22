@@ -12,9 +12,9 @@
 
 <p align="center">
 <a href="">
-    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/mverch67/device-ui-project"></a>
-    <a href="https://github.com/meshtastic/device-ui/issues">
-    <img alt="GitHub issues" src="https://img.shields.io/github/issues/mverch67/device-ui-project"></a>
+    <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/meshtastic/standalone-ui"></a>
+    <a href="https://github.com/meshtastic/standalone-ui/issues">
+    <img alt="GitHub issues" src="https://img.shields.io/github/issues/meshtastic/standalone-ui"></a>
   <a href="https://opencollective.com/meshtastic">
     <img alt="Open Collective backers" src="https://img.shields.io/opencollective/backers/meshtastic?label=support%20meshtastic">
   </a>
@@ -50,8 +50,8 @@ Finally build the MUI standalone firmware using a linux terminal as follows:
 
 ```bash
 # checkout the repository from github
-git clone --depth=1 --recursive https://github.com/mverch67/device-ui-project
-cd device-ui-project
+git clone --depth=1 --recursive https://github.com/meshtastic/standalone-ui
+cd standalone-ui
 
 # activate the pio environment
 source $HOME/.platformio/bin/penv/activate
@@ -81,4 +81,4 @@ cp .pio/build/native-mui/program $HOME/.local/bin/native-mui
 
 ## Stats
 
-![Alt](https://repobeats.axiom.co/api/embed/1205deb825cb7c902197ebab10aac3590ad8cc35.svg "Repobeats analytics image")
+![Alt](https://repobeats.axiom.co/api/embed/7caf5492ebef98d9b88747eba781e592a9682f9d.svg "Repobeats analytics image")
