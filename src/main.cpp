@@ -2,20 +2,17 @@
 
 #include "Arduino.h"
 #include "Log.h"
-#include "SDCard.h"
 #include "comms/EthClient.h"
 #include "comms/UARTClient.h"
 #include "graphics/DeviceScreen.h"
 
 #if defined(ARCH_PORTDUINO)
-#include "PortduinoFS.h"
 #include <thread>
-#define FSCom PortduinoFS
 #define FSBegin() true
 #else
 #include "LittleFS.h"
 #define FSCom LittleFS
-#define FSBegin() FSCom.begin(true)
+#define FSBegin() LittleFS.begin(true)
 #endif
 
 #if defined(I2C_SDA) || defined(I2C_SDA1)
@@ -94,8 +91,6 @@ void setup()
     if (!Wire.begin(I2C_SDA1, I2C_SCL1, 400000))
         ILOG_ERROR("*** Failed to access I2C1(%d, %d)", I2C_SDA1, I2C_SCL1);
 #endif
-
-    setupSDCard(); // note: done now also in device-ui (hot-swap)
 
     ILOG_INFO("\n//\\ E S H T /\\ S T / C   U I\n");
 #ifdef ARDUINO_ARCH_ESP32
