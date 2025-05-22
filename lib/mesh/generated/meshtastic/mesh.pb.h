@@ -241,6 +241,16 @@ typedef enum _meshtastic_HardwareModel {
     meshtastic_HardwareModel_T_ETH_ELITE = 91,
     /* Heltec HRI-3621 industrial probe */
     meshtastic_HardwareModel_HELTEC_SENSOR_HUB = 92,
+    /* Reserved Fried Chicken ID for future use */
+    meshtastic_HardwareModel_RESERVED_FRIED_CHICKEN = 93,
+    /* Heltec Magnetic Power Bank with Meshtastic compatible */
+    meshtastic_HardwareModel_HELTEC_MESH_POCKET = 94,
+    /* Seeed Solar Node */
+    meshtastic_HardwareModel_SEEED_SOLAR_NODE = 95,
+    /* NomadStar Meteor Pro https://nomadstar.ch/ */
+    meshtastic_HardwareModel_NOMADSTAR_METEOR_PRO = 96,
+    /* Elecrow CrowPanel Advance models, ESP32-S3 and TFT with SX1262 radio plugin */
+    meshtastic_HardwareModel_CROWPANEL = 97,
     /* ------------------------------------------------------------------------------------------------------------------------------------------
  Reserved ID For developing private Ports. These will show up in live traffic sparsely, so we can use a high number. Keep it
  within 8 bits.
@@ -335,7 +345,11 @@ typedef enum _meshtastic_ExcludedModules {
     /* Detection Sensor module */
     meshtastic_ExcludedModules_DETECTIONSENSOR_CONFIG = 2048,
     /* Paxcounter module */
-    meshtastic_ExcludedModules_PAXCOUNTER_CONFIG = 4096
+    meshtastic_ExcludedModules_PAXCOUNTER_CONFIG = 4096,
+    /* Bluetooth config (not technically a module, but used to indicate bluetooth capabilities) */
+    meshtastic_ExcludedModules_BLUETOOTH_CONFIG = 8192,
+    /* Network config (not technically a module, but used to indicate network capabilities) */
+    meshtastic_ExcludedModules_NETWORK_CONFIG = 16384
 } meshtastic_ExcludedModules;
 
 /* How the location was acquired: manual, onboard GPS, external (EUD) GPS */
@@ -605,6 +619,9 @@ typedef struct _meshtastic_User {
     /* The public key of the user's device.
  This is sent out to other nodes on the mesh to allow them to compute a shared secret key. */
     meshtastic_User_public_key_t public_key;
+    /* Whether or not the node can be messaged */
+    bool has_is_unmessagable;
+    bool is_unmessagable;
 } meshtastic_User;
 
 /* A message used in a traceroute */
@@ -847,6 +864,10 @@ typedef struct _meshtastic_NodeInfo {
     /* True if node is in our ignored list
  Persists between NodeDB internal clean ups */
     bool is_ignored;
+    /* True if node public key has been verified.
+ Persists between NodeDB internal clean ups
+ LSB 0 of the bitfield */
+    bool is_key_manually_verified;
 } meshtastic_NodeInfo;
 
 typedef PB_BYTES_ARRAY_T(16) meshtastic_MyNodeInfo_device_id_t;
@@ -1132,8 +1153,8 @@ extern "C" {
     ((meshtastic_CriticalErrorCode)(meshtastic_CriticalErrorCode_FLASH_CORRUPTION_UNRECOVERABLE + 1))
 
 #define _meshtastic_ExcludedModules_MIN meshtastic_ExcludedModules_EXCLUDED_NONE
-#define _meshtastic_ExcludedModules_MAX meshtastic_ExcludedModules_PAXCOUNTER_CONFIG
-#define _meshtastic_ExcludedModules_ARRAYSIZE ((meshtastic_ExcludedModules)(meshtastic_ExcludedModules_PAXCOUNTER_CONFIG + 1))
+#define _meshtastic_ExcludedModules_MAX meshtastic_ExcludedModules_NETWORK_CONFIG
+#define _meshtastic_ExcludedModules_ARRAYSIZE ((meshtastic_ExcludedModules)(meshtastic_ExcludedModules_NETWORK_CONFIG + 1))
 
 #define _meshtastic_Position_LocSource_MIN meshtastic_Position_LocSource_LOC_UNSET
 #define _meshtastic_Position_LocSource_MAX meshtastic_Position_LocSource_LOC_EXTERNAL
@@ -1192,13 +1213,7 @@ extern "C" {
     }
 #define meshtastic_User_init_default                                                                                             \
     {                                                                                                                            \
-        "", "", "", {0}, _meshtastic_HardwareModel_MIN, 0, _meshtastic_Config_DeviceConfig_Role_MIN,                             \
-        {                                                                                                                        \
-            0,                                                                                                                   \
-            {                                                                                                                    \
-                0                                                                                                                \
-            }                                                                                                                    \
-        }                                                                                                                        \
+        "", "", "", {0}, _meshtastic_HardwareModel_MIN, 0, _meshtastic_Config_DeviceConfig_Role_MIN, {0, {0}}, false, 0          \
     }
 #define meshtastic_RouteDiscovery_init_default                                                                                   \
     {                                                                                                                            \
@@ -1234,7 +1249,7 @@ extern "C" {
 #define meshtastic_NodeInfo_init_default                                                                                         \
     {                                                                                                                            \
         0, false, meshtastic_User_init_default, false, meshtastic_Position_init_default, 0, 0, false,                            \
-            meshtastic_DeviceMetrics_init_default, 0, 0, false, 0, 0, 0                                                          \
+            meshtastic_DeviceMetrics_init_default, 0, 0, false, 0, 0, 0, 0                                                       \
     }
 #define meshtastic_MyNodeInfo_init_default                                                                                       \
     {                                                                                                                            \
@@ -1336,13 +1351,7 @@ extern "C" {
     }
 #define meshtastic_User_init_zero                                                                                                \
     {                                                                                                                            \
-        "", "", "", {0}, _meshtastic_HardwareModel_MIN, 0, _meshtastic_Config_DeviceConfig_Role_MIN,                             \
-        {                                                                                                                        \
-            0,                                                                                                                   \
-            {                                                                                                                    \
-                0                                                                                                                \
-            }                                                                                                                    \
-        }                                                                                                                        \
+        "", "", "", {0}, _meshtastic_HardwareModel_MIN, 0, _meshtastic_Config_DeviceConfig_Role_MIN, {0, {0}}, false, 0          \
     }
 #define meshtastic_RouteDiscovery_init_zero                                                                                      \
     {                                                                                                                            \
@@ -1378,7 +1387,7 @@ extern "C" {
 #define meshtastic_NodeInfo_init_zero                                                                                            \
     {                                                                                                                            \
         0, false, meshtastic_User_init_zero, false, meshtastic_Position_init_zero, 0, 0, false,                                  \
-            meshtastic_DeviceMetrics_init_zero, 0, 0, false, 0, 0, 0                                                             \
+            meshtastic_DeviceMetrics_init_zero, 0, 0, false, 0, 0, 0, 0                                                          \
     }
 #define meshtastic_MyNodeInfo_init_zero                                                                                          \
     {                                                                                                                            \
@@ -1506,6 +1515,7 @@ extern "C" {
 #define meshtastic_User_is_licensed_tag 6
 #define meshtastic_User_role_tag 7
 #define meshtastic_User_public_key_tag 8
+#define meshtastic_User_is_unmessagable_tag 9
 #define meshtastic_RouteDiscovery_route_tag 1
 #define meshtastic_RouteDiscovery_snr_towards_tag 2
 #define meshtastic_RouteDiscovery_route_back_tag 3
@@ -1565,6 +1575,7 @@ extern "C" {
 #define meshtastic_NodeInfo_hops_away_tag 9
 #define meshtastic_NodeInfo_is_favorite_tag 10
 #define meshtastic_NodeInfo_is_ignored_tag 11
+#define meshtastic_NodeInfo_is_key_manually_verified_tag 12
 #define meshtastic_MyNodeInfo_my_node_num_tag 1
 #define meshtastic_MyNodeInfo_reboot_count_tag 8
 #define meshtastic_MyNodeInfo_min_app_version_tag 11
@@ -1677,7 +1688,8 @@ extern "C" {
     X(a, STATIC, SINGULAR, UENUM, hw_model, 5)                                                                                   \
     X(a, STATIC, SINGULAR, BOOL, is_licensed, 6)                                                                                 \
     X(a, STATIC, SINGULAR, UENUM, role, 7)                                                                                       \
-    X(a, STATIC, SINGULAR, BYTES, public_key, 8)
+    X(a, STATIC, SINGULAR, BYTES, public_key, 8)                                                                                 \
+    X(a, STATIC, OPTIONAL, BOOL, is_unmessagable, 9)
 #define meshtastic_User_CALLBACK NULL
 #define meshtastic_User_DEFAULT NULL
 
@@ -1767,7 +1779,8 @@ extern "C" {
     X(a, STATIC, SINGULAR, BOOL, via_mqtt, 8)                                                                                    \
     X(a, STATIC, OPTIONAL, UINT32, hops_away, 9)                                                                                 \
     X(a, STATIC, SINGULAR, BOOL, is_favorite, 10)                                                                                \
-    X(a, STATIC, SINGULAR, BOOL, is_ignored, 11)
+    X(a, STATIC, SINGULAR, BOOL, is_ignored, 11)                                                                                 \
+    X(a, STATIC, SINGULAR, BOOL, is_key_manually_verified, 12)
 #define meshtastic_NodeInfo_CALLBACK NULL
 #define meshtastic_NodeInfo_DEFAULT NULL
 #define meshtastic_NodeInfo_user_MSGTYPE meshtastic_User
@@ -2005,14 +2018,14 @@ extern const pb_msgdesc_t meshtastic_ChunkedPayloadResponse_msg;
 #define meshtastic_MyNodeInfo_size 77
 #define meshtastic_NeighborInfo_size 258
 #define meshtastic_Neighbor_size 22
-#define meshtastic_NodeInfo_size 319
+#define meshtastic_NodeInfo_size 323
 #define meshtastic_NodeRemoteHardwarePin_size 29
 #define meshtastic_Position_size 144
 #define meshtastic_QueueStatus_size 23
 #define meshtastic_RouteDiscovery_size 256
 #define meshtastic_Routing_size 259
 #define meshtastic_ToRadio_size 504
-#define meshtastic_User_size 113
+#define meshtastic_User_size 115
 #define meshtastic_Waypoint_size 165
 
 #ifdef __cplusplus

@@ -2,18 +2,17 @@
 
 #include "Arduino.h"
 #include "Log.h"
-#include "SDCard.h"
+#include "comms/EthClient.h"
 #include "comms/UARTClient.h"
 #include "graphics/DeviceScreen.h"
 
 #if defined(ARCH_PORTDUINO)
-#include "PortduinoFS.h"
-#define FSCom PortduinoFS
+#include <thread>
 #define FSBegin() true
 #else
 #include "LittleFS.h"
 #define FSCom LittleFS
-#define FSBegin() FSCom.begin(true)
+#define FSBegin() LittleFS.begin(true)
 #endif
 
 #if defined(I2C_SDA) || defined(I2C_SDA1)
@@ -21,8 +20,7 @@
 #endif
 
 // this is pulled in by the device-ui library
-const char *firmware_version = "2.6.5";
-static char connectionString[40];
+const char *firmware_version = "2.6.8";
 
 #ifdef USE_DUMMY_SERIAL
 class DummyClient : public IClientBase
@@ -40,17 +38,20 @@ class DummyClient : public IClientBase
         return dummy;
     }
     ~DummyClient(){};
-    bool isActive(void) const { return false; }
-    const char *getConnectionInfo(void) const { return "<undefined>"; }
 } serial;
 #else
-UARTClient serial;
+IClientBase *client = nullptr;
 #endif
 
 DeviceScreen *screen = nullptr;
 
 void setup()
 {
+#if defined(__APPLE__)
+    pthread_setname_np("setup");
+#elif defined(__linux__)
+    pthread_setname_np(pthread_self(), "setup");
+#endif
 #ifdef KB_POWERON
     digitalWrite(KB_POWERON, HIGH);
     pinMode(KB_POWERON, OUTPUT);
@@ -77,7 +78,7 @@ void setup()
     while (!Serial && (millis() - timeout) < 2000)
         ;
 #endif
-    logger.setDebugLevel(ESP_LOG_VERBOSE); // use ESP_LOG_VERBOSE for trace category
+    logger.setDebugLevel(ESP_LOG_DEBUG); // use ESP_LOG_VERBOSE for trace category
 #else
     logger.setDebugLevel(ESP_LOG_NONE); // do not log when connected over serial0
 #endif
@@ -91,9 +92,7 @@ void setup()
         ILOG_ERROR("*** Failed to access I2C1(%d, %d)", I2C_SDA1, I2C_SCL1);
 #endif
 
-    setupSDCard(); // note: done now also in device-ui (hot-swap)
-
-    ILOG_DEBUG("*** Meshtastic UI ***");
+    ILOG_INFO("\n//\\ E S H T /\\ S T / C   U I\n");
 #ifdef ARDUINO_ARCH_ESP32
     uint64_t chipid;
     chipid = ESP.getEfuseMac(); // The chip ID is essentially its MAC address(length: 6 bytes).
@@ -110,38 +109,82 @@ void setup()
         ILOG_ERROR("LittleFS mount failed!");
     }
 
+#ifdef ARCH_PORTDUINO
+    const char *hostname = getenv("MUI_SERVER");
+    if (hostname == nullptr) {
+        client = new EthClient();
+    } else {
+        client = new EthClient(hostname);
+    }
+    int16_t x = 480;
+    int16_t y = 480;
+    const char *size = getenv("MUI_SIZE");
+    if (size != nullptr) {
+        sscanf(size, "%" PRId16 "x%" PRId16, &x, &y);
+    }
+    if (x < 320 || x > 800)
+        x = 480;
+    if (y < 240 || y > 800)
+        y = 480;
+    screen = &DeviceScreen::create(DisplayDriverConfig(DisplayDriverConfig::device_t::X11, x, y));
+#else
+    client = new UARTClient();
     screen = &DeviceScreen::create();
-    screen->init(&serial);
-    sprintf(connectionString, "==> connect %s <==", serial.getConnectionInfo());
+#endif
+
+    screen->init(client);
 
 #ifdef ARDUINO_ARCH_ESP32
     ILOG_DEBUG("Free heap : %8d bytes", ESP.getFreeHeap());
     ILOG_DEBUG("PSRAM     : %8d bytes", ESP.getFreePsram());
 #endif
 
+#ifdef ARCH_PORTDUINO
+    // create separate thread to handle lvgl X11 GUI simulation
+    // otherwise the GUI will slow down the main thread
+    extern void tft_task_handler(void *param = nullptr);
+    new std::thread([] {
+#ifdef __APPLE__
+        pthread_setname_np("tft");
+#else
+        pthread_setname_np(pthread_self(), "tft");
+#endif
+        tft_task_handler();
+    });
+#endif
+
     ILOG_DEBUG("Setup done.");
+#if defined(__APPLE__)
+    pthread_setname_np("loop");
+#elif defined(__linux__)
+    pthread_setname_np(pthread_self(), "loop");
+#endif
 }
 
-/*** main loop ***/
+#if defined(ARCH_ESP32)
 void loop()
 {
-    if (millis() > 3000) {
-        if (serial.isActive()) {
-            firmware_version = "Connected!";
-        } else {
-            firmware_version = connectionString;
-        }
-    }
     screen->task_handler();
-    delay(5);
+    screen->sleep(5);
 }
 
-#if defined(ARCH_PORTDUINO)
+#elif defined(ARCH_PORTDUINO)
+void loop()
+{
+    delay(1000);
+    fflush(nullptr);
+}
+
 void tft_task_handler(void *)
 {
-    screen->task_handler();
-    delay(5);
+    ILOG_INFO("tft_task_handler started");
+    while (true) {
+        screen->task_handler();
+        screen->sleep(5);
+    }
 }
+#else
+#error "Unsupported architecture"
 #endif
 
 #endif

@@ -1,11 +1,11 @@
 // make linker happy during pio unit testing
 
 #include "Arduino.h"
-#include "DeviceScreen.h"
+#include "graphics/DeviceScreen.h"
 #include "Log.h"
 
 #ifdef USE_ILOG
-#include "ILog.h"
+#include "util/ILog.h"
 
 ILog *ILog::_logger = nullptr;
 #endif
