@@ -13,3 +13,5 @@ PB_BIND(meshtastic_HamParameters, meshtastic_HamParameters, AUTO)
 PB_BIND(meshtastic_NodeRemoteHardwarePinsResponse, meshtastic_NodeRemoteHardwarePinsResponse, 2)
 
 PB_BIND(meshtastic_SharedContact, meshtastic_SharedContact, AUTO)
+
+PB_BIND(meshtastic_KeyVerificationAdmin, meshtastic_KeyVerificationAdmin, AUTO)

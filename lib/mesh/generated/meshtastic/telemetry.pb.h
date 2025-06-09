@@ -278,6 +278,10 @@ typedef struct _meshtastic_LocalStats {
     /* Number of times we canceled a packet to be relayed, because someone else did it before us.
  This will always be zero for ROUTERs/REPEATERs. If this number is high, some other node(s) is/are relaying faster than you. */
     uint32_t num_tx_relay_canceled;
+    /* Number of bytes used in the heap */
+    uint32_t heap_total_bytes;
+    /* Number of bytes free in the heap */
+    uint32_t heap_free_bytes;
 } meshtastic_LocalStats;
 
 /* Health telemetry metrics */
@@ -380,7 +384,7 @@ extern "C" {
     }
 #define meshtastic_LocalStats_init_default                                                                                       \
     {                                                                                                                            \
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                                                                                          \
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                                                                                    \
     }
 #define meshtastic_HealthMetrics_init_default                                                                                    \
     {                                                                                                                            \
@@ -421,7 +425,7 @@ extern "C" {
     }
 #define meshtastic_LocalStats_init_zero                                                                                          \
     {                                                                                                                            \
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                                                                                          \
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0                                                                                    \
     }
 #define meshtastic_HealthMetrics_init_zero                                                                                       \
     {                                                                                                                            \
@@ -501,6 +505,8 @@ extern "C" {
 #define meshtastic_LocalStats_num_rx_dupe_tag 9
 #define meshtastic_LocalStats_num_tx_relay_tag 10
 #define meshtastic_LocalStats_num_tx_relay_canceled_tag 11
+#define meshtastic_LocalStats_heap_total_bytes_tag 12
+#define meshtastic_LocalStats_heap_free_bytes_tag 13
 #define meshtastic_HealthMetrics_heart_bpm_tag 1
 #define meshtastic_HealthMetrics_spO2_tag 2
 #define meshtastic_HealthMetrics_temperature_tag 3
@@ -598,7 +604,9 @@ extern "C" {
     X(a, STATIC, SINGULAR, UINT32, num_total_nodes, 8)                                                                           \
     X(a, STATIC, SINGULAR, UINT32, num_rx_dupe, 9)                                                                               \
     X(a, STATIC, SINGULAR, UINT32, num_tx_relay, 10)                                                                             \
-    X(a, STATIC, SINGULAR, UINT32, num_tx_relay_canceled, 11)
+    X(a, STATIC, SINGULAR, UINT32, num_tx_relay_canceled, 11)                                                                    \
+    X(a, STATIC, SINGULAR, UINT32, heap_total_bytes, 12)                                                                         \
+    X(a, STATIC, SINGULAR, UINT32, heap_free_bytes, 13)
 #define meshtastic_LocalStats_CALLBACK NULL
 #define meshtastic_LocalStats_DEFAULT NULL
 
@@ -675,7 +683,7 @@ extern const pb_msgdesc_t meshtastic_Nau7802Config_msg;
 #define meshtastic_EnvironmentMetrics_size 113
 #define meshtastic_HealthMetrics_size 11
 #define meshtastic_HostMetrics_size 264
-#define meshtastic_LocalStats_size 60
+#define meshtastic_LocalStats_size 72
 #define meshtastic_Nau7802Config_size 16
 #define meshtastic_PowerMetrics_size 30
 #define meshtastic_Telemetry_size 272
